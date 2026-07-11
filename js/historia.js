@@ -366,7 +366,12 @@ const Historia = {
       { quien: "Pelu", retrato: "pelu", texto: "(Mi cabeza va rápido y mis ideas me encantan… pero cuidar cómo se sienten las demás es la magia más linda.)" },
       { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Una idea brillante que hace sentir mal a las demás pierde su brillo. La inteligencia que INCLUYE es la más poderosa de todas." },
       { narra: "Pelu aprendió que ser lista no es para salirse con la suya, sino para que todas puedan brillar juntas. La empatía también es magia. 💜🎪" },
-      { fin: { estrellas: 20, mensaje: "Capítulo 4 completado. Aprendiste que manipular gana el juego pero pierde amigas — y que tu inteligencia sirve para incluir a todas y que brillen contigo. 💜" } },
+      { fondo: "feria", narra: "Justo entonces suena la campana del colegio: ¡RIIING! 🔔 Es el último día antes de las vacaciones de invierno. ❄️" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "¡Felices vacaciones, brujitas! Descansen, jueguen en la nieve… y guarden energía para lo que viene. ❄️✨" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "¡Vacaciones de invierno, Pelu! ¿Te imaginas todo lo que podríamos hacer con la nieve mágica? ⛄" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡No puedo esperar! Nuestra primera aventura de invierno juntas. 💜❄️" },
+      { narra: "Y así, con la primera nevada cayendo sobre el colegio, empiezan las vacaciones de invierno de Pelu… ❄️🏰" },
+      { fin: { estrellas: 20, mensaje: "Capítulo 4 completado. Aprendiste que manipular gana el juego pero pierde amigas — y que tu inteligencia sirve para incluir a todas. ¡Empiezan las vacaciones de invierno! ❄️ No te pierdas las aventuras que vienen… ⛄✨" } },
     ],
   },
 };
