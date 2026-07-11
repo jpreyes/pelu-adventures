@@ -42,6 +42,7 @@ const Estado = {
       },
       vestido: { sombrero: "gorro_estrella", collar: "lazo_rosa", gafas: null, mochila: null },
       habitacion: ["cama", "alfombra"],   // muebles colocados en la casa
+      posiciones: {},                     // key -> {x,y} en % dentro de la casa (arrastre libre)
       aventurasHechas: {},                // id -> veces completada
       coleccion: [],                      // tesoros secretos encontrados
       coleccionPeces: [],                 // especies de peces atrapadas (emoji)
@@ -321,19 +322,29 @@ const Juego = {
     })[t] || t;
   },
 
-  /* ---------- CASA: interactiva + decorar + clóset ---------- */
+  /* ---------- CASA: 3 habitaciones, objetos arrastrables ---------- */
   casa() {
-    const muebles = Estado.data.habitacion.map(id => {
+    const P = Estado.data.posiciones;
+    // objeto arrastrable: pos guardada o default
+    const obj = (tipo, id, contenido, defX, defY, extra = "") => {
+      const key = tipo + ":" + id;
+      const p = P[key] || { x: defX, y: defY };
+      return `<div class="obj-casa ${extra}" data-key="${key}" data-tipo="${tipo}" data-id="${id}"
+                style="left:${p.x}%;top:${p.y}%">${contenido}</div>`;
+    };
+
+    const muebles = Estado.data.habitacion.map((id, i) => {
       const m = buscar(DATA.muebles, id);
-      return `<span class="mueble-colocado interactivo" title="${m.nombre}"
-                onclick="Juego.reaccionMueble('${id}')">${m.emoji}</span>`;
+      const dx = 10 + (i % 3) * 30 + (i % 2) * 6, dy = 40 + (Math.floor(i / 3) % 3) * 16;
+      return obj("mueble", id, `<span class="emo-mueble">${m.emoji}</span>`, dx, dy);
     }).join("");
 
-    const mascotas = Estado.data.poseidos.mascotas.map(id => {
+    const mascotas = Estado.data.poseidos.mascotas.map((id, i) => {
       const m = buscar(DATA.mascotas, id);
-      return `<span class="mascota-libre interactivo" title="${m.nombre}"
-                onclick="Juego.reaccionMascota('${id}')">${m.emoji}</span>`;
+      return obj("mascota", id, `<span class="emo-mascota">${m.emoji}</span>`, 16 + i * 16, 82, "mascota-anim");
     }).join("");
+
+    const pk = Estado.data.posiciones["pelu:pelu"] || { x: 50, y: 55 };
 
     app().innerHTML = `
       ${barra()}
@@ -341,14 +352,18 @@ const Juego = {
         <button class="volver" onclick="Juego.mapa()">← Mapa</button>
         <h1>Casa de Pelu 🏠</h1>
 
-        <div class="habitacion" id="habitacion-casa">
-          <div class="muebles">${muebles}</div>
+        <div class="casa-tablero" id="casa-tablero">
+          <div class="cuarto-bg r1"><span class="cuarto-nombre">Dormitorio</span></div>
+          <div class="cuarto-bg r2"><span class="cuarto-nombre">Living</span></div>
+          <div class="cuarto-bg r3"><span class="cuarto-nombre">Jardín</span></div>
           <div class="burbuja" id="burbuja-pelu"></div>
-          <div class="pelu-en-casa interactivo" id="pelu-casa" onclick="Juego.reaccionPelu()">${dibujarPelu(100)}</div>
-          <div class="mascotas-zona">${mascotas}</div>
+          ${muebles}
+          ${mascotas}
+          <div class="obj-casa pelu-obj" id="pelu-casa" data-key="pelu:pelu" data-tipo="pelu" data-id="pelu"
+               style="left:${pk.x}%;top:${pk.y}%">${dibujarPelu(64)}</div>
         </div>
 
-        <p class="sub casa-pista">Toca a Pelu, sus mascotas o los muebles 🐾</p>
+        <p class="sub casa-pista">Arrastra a Pelu, sus mascotas y los muebles para ordenar la casa. Tócalos para que reaccionen 🐾</p>
         <div class="acciones-casa mimos">
           <button class="btn" onclick="Juego.mimo('acariciar')">🤍 Acariciar</button>
           <button class="btn" onclick="Juego.mimo('premio')">🍪 Premio</button>
@@ -359,29 +374,84 @@ const Juego = {
           <button class="btn grande" onclick="Juego.decorar()">🛋️ Decorar</button>
         </div>
       </div>`;
+
+    this._initArrastreCasa();
+  },
+
+  /* ---------- Arrastrar / ordenar los objetos de la casa ---------- */
+  _initArrastreCasa() {
+    const cont = document.getElementById("casa-tablero");
+    if (!cont) return;
+    let drag = null;
+    cont.querySelectorAll(".obj-casa").forEach(el => {
+      el.addEventListener("pointerdown", e => {
+        e.preventDefault();
+        drag = { el, key: el.dataset.key, moved: false, sx: e.clientX, sy: e.clientY };
+        el.setPointerCapture(e.pointerId);
+        el.classList.add("arrastrando");
+      });
+      el.addEventListener("pointermove", e => {
+        if (!drag || drag.el !== el) return;
+        if (Math.abs(e.clientX - drag.sx) > 5 || Math.abs(e.clientY - drag.sy) > 5) drag.moved = true;
+        const r = cont.getBoundingClientRect();
+        const x = Math.max(5, Math.min(95, (e.clientX - r.left) / r.width * 100));
+        const y = Math.max(12, Math.min(92, (e.clientY - r.top) / r.height * 100));
+        el.style.left = x + "%"; el.style.top = y + "%";
+        drag.x = x; drag.y = y;
+      });
+      const fin = () => {
+        if (!drag || drag.el !== el) return;
+        el.classList.remove("arrastrando");
+        if (drag.moved) {
+          Estado.data.posiciones[drag.key] = { x: drag.x, y: drag.y };
+          Estado.guardar();
+        } else {
+          this._tapObjeto(el.dataset.tipo, el.dataset.id, el);
+        }
+        drag = null;
+      };
+      el.addEventListener("pointerup", fin);
+      el.addEventListener("pointercancel", fin);
+    });
+  },
+
+  _tapObjeto(tipo, id, el) {
+    if (tipo === "pelu") this.reaccionPelu(el);
+    else if (tipo === "mascota") this.reaccionMascota(id, el);
+    else if (tipo === "mueble") this.reaccionMueble(id, el);
   },
 
   /* ---------- Interacciones de la casa ---------- */
   _peluExpr(expresion) {
     const el = document.getElementById("pelu-casa");
-    if (el) el.innerHTML = dibujarPelu(100, expresion);
+    if (el) el.innerHTML = dibujarPelu(64, expresion);
   },
-  burbuja(texto) {
+  burbuja(texto, el) {
+    const cont = document.getElementById("casa-tablero");
     const b = document.getElementById("burbuja-pelu");
-    if (!b) return;
+    if (!b || !cont) return;
     b.textContent = texto;
+    if (el) {
+      const r = cont.getBoundingClientRect(), er = el.getBoundingClientRect();
+      b.style.left = ((er.left + er.width / 2 - r.left) / r.width * 100) + "%";
+      b.style.top = Math.max(1, (er.top - r.top) / r.height * 100 - 6) + "%";
+    }
     b.classList.add("ver");
     clearTimeout(this._burbTO);
     this._burbTO = setTimeout(() => b.classList.remove("ver"), 1800);
   },
-  flotar(emojis) {
-    const cont = document.getElementById("habitacion-casa");
+  flotar(emojis, el) {
+    const cont = document.getElementById("casa-tablero");
     if (!cont) return;
+    let baseX = 50, baseY = 50;
+    if (el) { const r = cont.getBoundingClientRect(), er = el.getBoundingClientRect();
+      baseX = (er.left + er.width / 2 - r.left) / r.width * 100;
+      baseY = (er.top - r.top) / r.height * 100; }
     emojis.forEach((em, i) => {
       const s = document.createElement("span");
-      s.className = "mimo-emoji";
-      s.textContent = em;
-      s.style.left = 40 + Math.random() * 30 + "%";
+      s.className = "mimo-emoji"; s.textContent = em;
+      s.style.left = Math.max(2, Math.min(94, baseX - 6 + Math.random() * 12)) + "%";
+      s.style.top = baseY + "%";
       s.style.animationDelay = i * 0.08 + "s";
       cont.appendChild(s);
       setTimeout(() => s.remove(), 1400);
@@ -392,37 +462,39 @@ const Juego = {
     if (!el) return;
     el.classList.remove("brinca"); void el.offsetWidth; el.classList.add("brinca");
   },
+  peluEl() { return document.getElementById("pelu-casa"); },
 
-  reaccionPelu() {
+  reaccionPelu(el) {
     const frases = ["¡Miau! 😽", "prrr… 😻", "¡Me encanta estar contigo! 💕", "¿Jugamos? 🐾", "¡Hola! 🐱"];
-    this.burbuja(rnd(frases));
-    this.flotar(["💕", "✨", "😽"]);
+    this.burbuja(rnd(frases), el || this.peluEl());
+    this.flotar(["💕", "✨", "😽"], el || this.peluEl());
     this._peluExpr("feliz"); this.saltoPelu();
   },
-  reaccionMascota(id) {
+  reaccionMascota(id, el) {
     const m = buscar(DATA.mascotas, id);
     const sonidos = { perrito: "¡Guau! 🐶", conejo: "¡Boing! 🐰", pajaro: "¡Pío pío! 🐤",
       tortuga: "…lento pero feliz 🐢", unicornio: "✨¡Magia!✨ 🦄", mariposa: "flap flap 🦋" };
-    this.burbuja(sonidos[id] || `¡${m.nombre}! 💗`);
-    this.flotar([m.emoji, "💗"]);
+    this.burbuja(sonidos[id] || `¡${m.nombre}! 💗`, el);
+    this.flotar([m.emoji, "💗"], el);
   },
-  reaccionMueble(id) {
+  reaccionMueble(id, el) {
     const react = {
       tele: ["¡Dibujos animados! 🎬", "📺✨"], planta: ["La plantita crece 🌱", "🌿✨"],
       lampara: ["¡Luz calentita! 💡", "✨"], sillon: ["¡Qué cómodo! 😌", "💤"],
       cama: ["Zzz… siesta 😴", "💤💤"], piano: ["♪ ♫ ¡Música! 🎶", "🎵🎶"],
       pecera: ["Glup glup 🐠", "💧🫧"], globos: ["¡Fiesta! 🎉", "🎈🎈"],
       libros: ["A leer un cuento 📖", "📚✨"], cuadro: ["Qué bonito 🖼️", "✨"],
-      mesa: ["La mesita 🪑", "✨"], alfombra: ["Suavecita 🧶", "✨"], lampara2: ["", ""],
+      mesa: ["La mesita 🪑", "✨"], alfombra: ["Suavecita 🧶", "✨"],
     };
     const r = react[id] || ["✨", "✨"];
-    if (r[0]) this.burbuja(r[0]);
-    this.flotar(r[1].split(""));
+    if (r[0]) this.burbuja(r[0], el);
+    this.flotar(r[1].split(""), el);
   },
   mimo(tipo) {
-    if (tipo === "acariciar") { this.burbuja("¡Prrr, qué rico! 😽"); this.flotar(["🤍", "💕", "✨"]); this._peluExpr("feliz"); }
-    else if (tipo === "premio") { this.burbuja("¡Ñam ñam! 😋"); this.flotar(["🍪", "😋", "💛"]); this._peluExpr("sorpresa"); }
-    else if (tipo === "jugar") { this.burbuja("¡Yupi, a jugar! 🧶"); this.flotar(["🧶", "🐾", "🎉"]); this._peluExpr("guino"); }
+    const p = this.peluEl();
+    if (tipo === "acariciar") { this.burbuja("¡Prrr, qué rico! 😽", p); this.flotar(["🤍", "💕", "✨"], p); this._peluExpr("feliz"); }
+    else if (tipo === "premio") { this.burbuja("¡Ñam ñam! 😋", p); this.flotar(["🍪", "😋", "💛"], p); this._peluExpr("sorpresa"); }
+    else if (tipo === "jugar") { this.burbuja("¡Yupi, a jugar! 🧶", p); this.flotar(["🧶", "🐾", "🎉"], p); this._peluExpr("guino"); }
     this.saltoPelu();
     clearTimeout(this._exprTO);
     this._exprTO = setTimeout(() => this._peluExpr("feliz"), 1600);
