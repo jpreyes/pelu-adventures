@@ -26,6 +26,7 @@ const Historia = {
     clase:  { grad: "linear-gradient(160deg,#3a2a5a,#6a4a8a)", deco: ["🪄", "📚", "🕯️", "✨", "🔮"] },
     patio:  { grad: "linear-gradient(160deg,#20304a,#3a5a7a)", deco: ["🌙", "🌳", "⭐", "✨"] },
     jardin: { grad: "linear-gradient(160deg,#243a3a,#3a6a5a 70%,#5a8a6a)", deco: ["🌙", "🌿", "🌸", "✨", "🦋"] },
+    espejo: { grad: "linear-gradient(160deg,#14121e,#2a2440 70%,#3a3560)", deco: ["🪞", "🕯️", "🕸️", "✨", "🌙"] },
   },
 
   start(capId = "cap1", lugar = "colegio") {
@@ -252,7 +253,63 @@ const Historia = {
       { quien: "Pelu", retrato: "pelu", texto: "(El volcán… desapareció solito. Ayudar a Luna se sintió mil veces mejor que hacer diez burbujas yo sola.)" },
       { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "¿Lo ves, Pelu? Tu mente rápida es un regalo. No para presumir… sino para ayudar y para buscar retos más grandes." },
       { narra: "Pelu aprendió que el aburrimiento no es su enemigo: es una señal de que necesita un reto mayor. Y que la paciencia también es una magia poderosa. 💜🐉" },
-      { fin: { estrellas: 15, mensaje: "Capítulo 2 completado. Aprendiste la Respiración del Dragón 🐉 y que ayudar vale más que presumir. ¡Luna es tu mejor amiga! Pronto vendrán más aventuras…" } },
+      { fin: { estrellas: 15, mensaje: "Capítulo 2 completado. Aprendiste la Respiración del Dragón 🐉 y que ayudar vale más que presumir. ¡Luna es tu mejor amiga! En el Cap. 3 aparece un espejo que susurra cosas feas… 🪞" } },
+    ],
+
+    cap3: [
+      { fondo: "espejo", narra: "Buscando la biblioteca, Pelu se pierde por un pasillo oscuro del colegio. Al fondo, un espejo antiguo brilla con una luz fría. 🪞" },
+      { narra: "Cuando Pelu se acerca, el espejo… le habla. Su voz es fría y burlona. 🥶" },
+      { quien: "Espejo Susurrante", retrato: "🪞", texto: "Vaya, vaya… la gatita RARA. Mitad esto, mitad lo otro. No eres ni una cosa ni la otra, ¿verdad?" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Un nudo en la garganta. ¿Cómo sabe justo lo que más me asusta?)" },
+      { quien: "Espejo Susurrante", retrato: "🪞", texto: "Ayer te equivocaste en un hechizo. Eso prueba que eres un desastre. TODO te sale mal." },
+      { quien: "Pelu", retrato: "pelu", texto: "(¿Será… será verdad lo que dice?)" },
+
+      { eleccion: "El espejo susurra cosas feas. ¿Qué hace Pelu?", opciones: [
+        { t: "😔 Creerle al espejo", ir: "creer" },
+        { t: "🤨 Dudar de lo que dice", ir: "dudar" },
+      ] },
+
+      { etiqueta: "creer" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Quizás tiene razón. Quizás sí soy rara y todo me sale mal…)" },
+      { narra: "Con cada pensamiento triste, el espejo brilla más fuerte y crece. ¡Se alimenta de las dudas de Pelu! 😨" },
+      { quien: "Espejo Susurrante", retrato: "🪞", texto: "Jajaja… sí, créeme. Cuanto más me crees, MÁS fuerte me hago." },
+      { ir: "luna" },
+
+      { etiqueta: "dudar" },
+      { quien: "Pelu", retrato: "pelu", texto: "Un momento… ¿por qué un espejo sabría lo que soy? Solo me repite mis miedos." },
+      { narra: "El espejo tiembla un poquito, como molesto. No le gusta nada que Pelu dude de él." },
+      { ir: "luna" },
+
+      { etiqueta: "luna" },
+      { narra: "De pronto llega Luna corriendo por el pasillo. 🐈‍⬛" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "¡Pelu! ¡Aléjate de ahí! Es el Espejo Susurrante. Le dice cosas feas a todas… y se hace grande cuando le creemos." },
+      { quien: "Pelu", retrato: "pelu", texto: "¿Entonces lo que dice… no es verdad?" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "Es la “voz mentirosa”. Dice tus miedos como si fueran hechos. Pero un miedo NO es un hecho." },
+
+      { fondo: "espejo", narra: "Aparece la Directora Estela con su farol encendido. 🏮" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Ese espejo solo tiene el poder que tú le das. La voz mentirosa exagera: convierte UN error en “todo me sale mal”. Aprende a reconocerla." },
+
+      { reto: "¿Cuál de estas es la “voz mentirosa” que exagera y te trata mal?", opciones: [
+        { t: "🌀 “Me equivoqué en una suma, así que soy tonta y TODO me sale mal.”", ok: true },
+        { t: "🙂 “Me equivoqué en una suma. La reviso y lo intento otra vez.”", nudge: "Esa es una voz amable y verdadera 🙂 Busca la que exagera y te insulta." },
+        { t: "💜 “Me costó, pero pedí ayuda y aprendí.”", nudge: "Esa es una voz sabia y buena 💜 La mentirosa es la que exagera un error en un “todo”." },
+      ] },
+
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "¡Muy bien! Ahora el hechizo más poderoso: RESPÓNDELE con la verdad, como le hablarías a tu mejor amiga." },
+
+      { reto: "El espejo dice: “¡Eres rara y no le importas a nadie!” ¿Qué le responde Pelu con la verdad?", opciones: [
+        { t: "💜 “Soy diferente, y eso es mi magia. Y Luna es mi amiga de verdad.”", ok: true },
+        { t: "😢 “Tienes razón… nadie me quiere.”", nudge: "Eso es creerle a la voz mentirosa 😢 Respóndele con lo que SÍ es verdad de ti." },
+        { t: "😠 “¡Cállate, espejo feo!”", nudge: "No hace falta insultar 😊 Basta con decir, tranquila, la verdad amable sobre ti." },
+      ] },
+
+      { narra: "Con cada verdad que dice Pelu, el Espejo Susurrante se agrieta… ¡CRACK! Su luz fría se apaga y queda solo un espejo normal. ✨" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Me sentía tan mal… y solo era una voz asustada exagerando. No era la verdad.)" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "¡Lo callaste, Pelu! ¿Cómo lo hiciste?" },
+      { quien: "Pelu", retrato: "pelu", texto: "Me hablé como te hablaría a ti: con cariño y con la verdad. 💜" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Esa, Pelu, es la magia más difícil de todas: ser tu propia amiga. La voz mentirosa volverá a veces… y ya sabes responderle." },
+      { narra: "Pelu aprendió que sus miedos no son hechos, y que puede responderle a la voz mentirosa con la verdad y con cariño hacia sí misma. 🪞💜" },
+      { fin: { estrellas: 20, mensaje: "Capítulo 3 completado. Aprendiste a reconocer la “voz mentirosa” y a responderle con la verdad. ¡Eres tu propia amiga! Pronto habrá más aventuras en el colegio…" } },
     ],
   },
 };

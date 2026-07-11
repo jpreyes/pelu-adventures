@@ -287,6 +287,19 @@ const Juego = {
     const avs = DATA.aventuras.filter(a => a.lugar === id);
     const tarjetas = avs.map(a => {
       const hechas = Estado.data.aventurasHechas[a.id] || 0;
+      // Desbloqueo progresivo: si "requiere" otro reto, debe estar completado
+      const bloqueada = a.requiere && !this.retoHecho(a.requiere);
+      if (bloqueada) {
+        const req = buscar(DATA.aventuras, a.requiere);
+        return `
+          <div class="aventura bloqueada" onclick="Juego.avBloqueada('${req ? req.nombre : ""}')">
+            <div class="aventura-emoji">🔒</div>
+            <div>
+              <div class="aventura-nombre">${a.nombre}</div>
+              <div class="aventura-tag tag-${a.tipo}">Termina ${req ? req.nombre : "lo anterior"} primero</div>
+            </div>
+          </div>`;
+      }
       return `
         <div class="aventura" onclick="Aventura.empezar('${a.id}')">
           <div class="aventura-emoji">${a.emoji}</div>
@@ -309,6 +322,16 @@ const Juego = {
         <h2>Aventuras</h2>
         <div class="lista-aventuras">${tarjetas}</div>
       </div>`;
+  },
+
+  // ¿Un reto/capítulo ya fue completado? (sirve para el desbloqueo progresivo)
+  retoHecho(id) {
+    if (Estado.data.historia && Estado.data.historia.includes(id)) return true;
+    return (Estado.data.aventurasHechas[id] || 0) > 0;
+  },
+
+  avBloqueada(nombreReq) {
+    toast(`🔒 Primero termina ${nombreReq || "el capítulo anterior"}`);
   },
 
   nombreTipo(t) {

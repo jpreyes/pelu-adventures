@@ -124,6 +124,9 @@ h2 { font-size: 1.2rem; text-align: center; color: var(--rosa); }
 .tag-logica { background:#e9e1ff; } .tag-dinero { background:#fff3cf; } .tag-decision { background:#ffe1e1; }
 .nueva { margin-left: auto; background: var(--verde); color:#fff; padding:4px 10px; border-radius:12px; font-size:.8rem; }
 .hechas { margin-left: auto; background: var(--amarillo); color:#fff; padding:4px 10px; border-radius:12px; font-weight:bold; }
+.aventura.bloqueada { background:#efeaf2; border-color:#d9cfe2; opacity:.72; }
+.aventura.bloqueada .aventura-nombre { color:#8a7f97; }
+.aventura.bloqueada .aventura-tag { background:#e2d9ec; color:#7a6f87; }
 
 /* ---------- Casa / habitación ---------- */
 .habitacion {

@@ -189,7 +189,18 @@ const DATA = {
       emoji: "🌋",
       tipo: "historia",
       capitulo: "cap2",
+      requiere: "cap1",
       intro: "🌋 Segundo capítulo. La clase repite un hechizo que Pelu ya domina y por dentro le crece un “volcán” de aburrimiento. Aprende la Respiración del Dragón 🐉 y descubre que su mente rápida sirve para ayudar a Luna. Toca para leer y elegir.",
+    },
+    {
+      id: "cap3",
+      lugar: "colegio",
+      nombre: "Cap. 3: El Espejo Susurrante",
+      emoji: "🪞",
+      tipo: "historia",
+      capitulo: "cap3",
+      requiere: "cap2",
+      intro: "🪞 Tercer capítulo. Un espejo mágico le susurra a Pelu cosas feas para hacerla dudar de sí misma. Con Luna, aprenderá a reconocer esa “voz mentirosa” y a responderle con la verdad. Toca para leer y elegir.",
     },
   ],
 
