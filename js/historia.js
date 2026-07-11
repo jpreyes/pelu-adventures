@@ -25,6 +25,7 @@ const Historia = {
     puerta: { grad: "linear-gradient(160deg,#2a1a4a,#5a3a7a 70%,#7a5a9a)", deco: ["🏰", "🌙", "⭐", "✨", "🦇"] },
     clase:  { grad: "linear-gradient(160deg,#3a2a5a,#6a4a8a)", deco: ["🪄", "📚", "🕯️", "✨", "🔮"] },
     patio:  { grad: "linear-gradient(160deg,#20304a,#3a5a7a)", deco: ["🌙", "🌳", "⭐", "✨"] },
+    jardin: { grad: "linear-gradient(160deg,#243a3a,#3a6a5a 70%,#5a8a6a)", deco: ["🌙", "🌿", "🌸", "✨", "🦋"] },
   },
 
   start(capId = "cap1", lugar = "colegio") {
@@ -183,7 +184,75 @@ const Historia = {
       { quien: "Luna", retrato: "🐈‍⬛", texto: "Pelu, ¿seremos amigas? Me encanta cómo piensas distinto." },
       { quien: "Pelu", retrato: "pelu", texto: "¡Sí! Quizás ser diferente… no es tan malo después de todo. 💜" },
       { narra: "Y así, en su primer día, Pelu descubrió que aquello que la hacía sentir distinta era, en realidad, su magia más especial. 🦇🔮" },
-      { fin: { estrellas: 15, mensaje: "Capítulo 1 completado. ¡Hiciste una amiga: Luna 🐈‍⬛! Pronto habrá más aventuras en el colegio…" } },
+      { fin: { estrellas: 15, mensaje: "Capítulo 1 completado. ¡Hiciste una amiga: Luna 🐈‍⬛! En el Capítulo 2 aprenderás qué hacer cuando algo aburre y el volcán crece por dentro… 🌋" } },
+    ],
+
+    cap2: [
+      { fondo: "clase", narra: "Han pasado unos días. Pelu ya tiene una amiga del alma: Luna 🐈‍⬛. Hoy toca clase de hechizos… otra vez." },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Hoy repetiremos el hechizo de la burbuja flotante 🫧. Todas juntas, ¡una y otra vez, hasta que salga perfecto!" },
+      { quien: "Pelu", retrato: "pelu", texto: "(¿Otra vez? Yo ya lo aprendí el primer día… y el segundo… y el tercero.)" },
+      { narra: "Mientras las demás practican, Pelu ya hizo diez burbujas perfectas. Se aburre. Por dentro, algo empieza a hervir… 🌋" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Es como un volcán en mi panza. Todo va tan LENTO. ¡Siento que voy a estallar!)" },
+
+      { eleccion: "El volcán crece por dentro. ¿Qué hace Pelu?", opciones: [
+        { t: "🌋 Estallar: “¡Esto es aburridíííísimo!”", ir: "estallar" },
+        { t: "🫁 Parar y respirar hondo", ir: "respirar" },
+      ] },
+
+      { etiqueta: "estallar" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡ESTO ES ABURRIDÍSIMO! ¡Ya me lo sé de memoria!" },
+      { narra: "La sala queda en silencio. Mia y Nina se ríen por lo bajo. A Pelu le arden las mejillas de vergüenza. 😳" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Pelu, entiendo que te aburras. Pero el volcán salió sin permiso, ¿verdad? Ven, te enseño un truco." },
+      { ir: "truco" },
+
+      { etiqueta: "respirar" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Inhalo… 1, 2, 3… y suelto el aire despacito. El volcán baja un poquito.)" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Vi que te aburrías… y que respiraste en vez de estallar. Eso, Pelu, es magia muy poderosa. Ven conmigo." },
+      { ir: "truco" },
+
+      { etiqueta: "truco" },
+      { fondo: "jardin", narra: "Estela lleva a Pelu al Jardín de la Luna 🌙. El aire es fresco y todo está en calma." },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Cuando algo es muy fácil y te aburres, el volcán crece. No eres mala: es que tu mente va rapidísimo y pide MÁS." },
+      { quien: "Pelu", retrato: "pelu", texto: "¿Y entonces qué hago con el volcán? A veces me da miedo lo grande que se pone." },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Primero, la Respiración del Dragón 🐉: aire hondo por la nariz, y sueltas el humo despacio por la boca. El volcán se hace pequeñito." },
+
+      { reto: "Cuando algo te aburre y sientes el volcán 🌋, ¿qué es lo primero y más sano que puedes hacer?", opciones: [
+        { t: "🫁 Respirar y ponerle nombre a lo que siento", ok: true },
+        { t: "🌋 Gritar para que todos me escuchen", nudge: "Gritar hace crecer el volcán 🌋 ¿Qué lo calma en vez de agrandarlo?" },
+        { t: "🙊 Guardármelo y aguantar hasta reventar", nudge: "Guardarlo tampoco ayuda… el volcán necesita salir con calma, no de golpe." },
+      ] },
+
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "¡Exacto! Y ahora el segundo truco: convierte el aburrimiento en un reto NUEVO. Mira a tu alrededor… ¿quién necesita ayuda?" },
+
+      { fondo: "clase", narra: "De vuelta en clase, Pelu ve a Luna. Su burbuja se pincha una y otra vez. Luna está a punto de llorar. 😢" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "No me sale… todas pueden menos yo. Soy un desastre." },
+      { quien: "Pelu", retrato: "pelu", texto: "(Yo lo hago con los ojos cerrados… pero para Luna es dificilísimo. Ahora entiendo cómo se siente atascarse.)" },
+
+      { eleccion: "Pelu tiene su “reto nuevo”. ¿Qué hace?", opciones: [
+        { t: "💜 Ayudar a Luna con paciencia", ir: "ayudar" },
+        { t: "🏆 Presumir lo fácil que es para mí", ir: "presumir" },
+      ] },
+
+      { etiqueta: "presumir" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡Es facilísimo, mira! Uno, dos, ¡listo! ¿Ves qué fácil es?" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "…Para ti. Yo ahora me siento peor todavía." },
+      { narra: "Luna baja las orejas y se aleja triste. A Pelu se le encoge el corazón: presumir tampoco calmó nada. 💔" },
+      { quien: "Pelu", retrato: "pelu", texto: "Perdón, Luna. No quise hacerte sentir mal. Empecemos de nuevo… ¿te ayudo de verdad esta vez?" },
+      { ir: "ayudar" },
+
+      { etiqueta: "ayudar" },
+      { quien: "Pelu", retrato: "pelu", texto: "Luna, no eres un desastre. Hazlo LENTO conmigo: respira… y mueve la varita en círculos suaves, siguiendo el patrón." },
+      { reto: "Para que la burbuja no se pinche, la varita sigue un patrón mágico. Continúa la serie: 🔵🔵🟣 · 🔵🔵🟣 · 🔵🔵…", opciones: [
+        { t: "🟣", ok: true },
+        { t: "🔵", nudge: "Mira el patrón: dos azules y un morado, y se repite → 🔵🔵🟣" },
+        { t: "🔴", nudge: "No hay rojo en el patrón. Fíjate bien: 🔵🔵🟣 · 🔵🔵🟣…" },
+      ] },
+      { narra: "¡La burbuja de Luna se infla grande y brillante y sale flotando! 🫧✨ Luna salta de felicidad." },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "¡LO LOGRÉ! Gracias, Pelu… me tuviste paciencia y no te reíste de mí. 💜" },
+      { quien: "Pelu", retrato: "pelu", texto: "(El volcán… desapareció solito. Ayudar a Luna se sintió mil veces mejor que hacer diez burbujas yo sola.)" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "¿Lo ves, Pelu? Tu mente rápida es un regalo. No para presumir… sino para ayudar y para buscar retos más grandes." },
+      { narra: "Pelu aprendió que el aburrimiento no es su enemigo: es una señal de que necesita un reto mayor. Y que la paciencia también es una magia poderosa. 💜🐉" },
+      { fin: { estrellas: 15, mensaje: "Capítulo 2 completado. Aprendiste la Respiración del Dragón 🐉 y que ayudar vale más que presumir. ¡Luna es tu mejor amiga! Pronto vendrán más aventuras…" } },
     ],
   },
 };

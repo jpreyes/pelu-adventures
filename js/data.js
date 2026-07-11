@@ -182,6 +182,15 @@ const DATA = {
       capitulo: "cap1",
       intro: "🏰 La novela de Pelu. Es su primer día en el Colegio de Gatitas Brujitas. Pelu es mitad brujita 🔮 y mitad vampira 🦇 — la única así. Toca para leer y elige qué hace.",
     },
+    {
+      id: "cap2",
+      lugar: "colegio",
+      nombre: "Cap. 2: El Volcán",
+      emoji: "🌋",
+      tipo: "historia",
+      capitulo: "cap2",
+      intro: "🌋 Segundo capítulo. La clase repite un hechizo que Pelu ya domina y por dentro le crece un “volcán” de aburrimiento. Aprende la Respiración del Dragón 🐉 y descubre que su mente rápida sirve para ayudar a Luna. Toca para leer y elegir.",
+    },
   ],
 
   // -------- PECES del Lago (colección + valores) --------
