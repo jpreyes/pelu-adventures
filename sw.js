@@ -4,7 +4,7 @@
    Sube el número de versión cuando cambies archivos para que
    se actualice el caché.
    ============================================================ */
-const VERSION = "pelu-v15";
+const VERSION = "pelu-v16";
 const ASSETS = [
   "./",
   "./index.html",

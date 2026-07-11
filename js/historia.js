@@ -27,6 +27,7 @@ const Historia = {
     patio:  { grad: "linear-gradient(160deg,#20304a,#3a5a7a)", deco: ["🌙", "🌳", "⭐", "✨"] },
     jardin: { grad: "linear-gradient(160deg,#243a3a,#3a6a5a 70%,#5a8a6a)", deco: ["🌙", "🌿", "🌸", "✨", "🦋"] },
     espejo: { grad: "linear-gradient(160deg,#14121e,#2a2440 70%,#3a3560)", deco: ["🪞", "🕯️", "🕸️", "✨", "🌙"] },
+    feria:  { grad: "linear-gradient(160deg,#4a2a5a,#8a4a7a 60%,#d98ab0)", deco: ["🎪", "🎈", "🔮", "✨", "🍬"] },
   },
 
   start(capId = "cap1", lugar = "colegio") {
@@ -309,7 +310,63 @@ const Historia = {
       { quien: "Pelu", retrato: "pelu", texto: "Me hablé como te hablaría a ti: con cariño y con la verdad. 💜" },
       { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Esa, Pelu, es la magia más difícil de todas: ser tu propia amiga. La voz mentirosa volverá a veces… y ya sabes responderle." },
       { narra: "Pelu aprendió que sus miedos no son hechos, y que puede responderle a la voz mentirosa con la verdad y con cariño hacia sí misma. 🪞💜" },
-      { fin: { estrellas: 20, mensaje: "Capítulo 3 completado. Aprendiste a reconocer la “voz mentirosa” y a responderle con la verdad. ¡Eres tu propia amiga! Pronto habrá más aventuras en el colegio…" } },
+      { fin: { estrellas: 20, mensaje: "Capítulo 3 completado. Aprendiste a reconocer la “voz mentirosa” y a responderle con la verdad. ¡Eres tu propia amiga! En el Cap. 4 hay una feria… y una amiga que quiere salirse con la suya. 🎪" } },
+    ],
+
+    cap4: [
+      { fondo: "clase", narra: "Hoy el colegio prepara la Feria de las Brujitas 🎪. Cada grupo arma un puesto mágico. A Pelu le toca con Luna, Mia y Nina." },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "La regla es sencilla: entre las cuatro deciden QUÉ puesto hacer. Todas las ideas valen. ¡A ponerse de acuerdo!" },
+      { quien: "Nina", retrato: "🐈", texto: "Emm… ¿y si hacemos un puesto de Burbujas de los Deseos? Cada quien pide un deseo y sopla…" },
+      { quien: "Mia", retrato: "🐱", texto: "¿Burbujas? Bah, eso es de bebés. MI idea es un Castillo de Fuego Púrpura. Es mucho mejor. Hagamos la mía." },
+      { quien: "Nina", retrato: "🐈", texto: "Bueno… si tú lo dices…" },
+      { narra: "Pelu nota algo: Mia no está convenciendo… está EMPUJANDO. Y a Nina se le apagó la carita. 😔" },
+
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "Podríamos votar, ¿no? Así es justo para todas." },
+      { quien: "Mia", retrato: "🐱", texto: "¡Sí, votemos! …Pero si votan por las burbujas, ya no las invito a mi fiesta de cumpleaños. 😼" },
+      { narra: "Mia cambió el juego: ya no es una idea mejor… es un poquito de chantaje. Nina, asustada, levanta la mano por el castillo." },
+      { quien: "Pelu", retrato: "pelu", texto: "(Yo entiendo a Mia… a veces mi idea también me parece la mejor y quiero que se haga a mi manera. Pero esto… no se siente justo.)" },
+
+      { eleccion: "Mia está manipulando para salirse con la suya. ¿Qué hace Pelu?", opciones: [
+        { t: "🤐 Callarse: la idea de Mia igual es buena", ir: "callar" },
+        { t: "✋ Decir que así no se hace", ir: "hablar" },
+      ] },
+
+      { etiqueta: "callar" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Mejor no digo nada… la idea del castillo igual se ve genial.)" },
+      { narra: "Pero Nina baja la cabecita y aprieta los labios para no llorar. A Luna se le borra la sonrisa. Algo se siente feo. 😞" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Ganar así… no se siente como ganar. No puedo quedarme callada mientras Nina se siente tan mal.)" },
+      { ir: "hablar" },
+
+      { etiqueta: "hablar" },
+      { quien: "Pelu", retrato: "pelu", texto: "Momento, Mia. Que no invites a alguien a tu fiesta por votar distinto… eso no es votar. Así no se hace." },
+      { quien: "Mia", retrato: "🐱", texto: "¡Pero es que la idea de Nina es floja y la mía es MUCHO mejor! La feria tiene que quedar perfecta." },
+      { quien: "Pelu", retrato: "pelu", texto: "Te entiendo más de lo que crees. A mí también me pasa: veo mi idea clarísima y quiero que se haga YA. Pero mira la cara de Nina." },
+      { narra: "Todas miran a Nina, que tiene los ojitos aguados. 🥺" },
+      { quien: "Pelu", retrato: "pelu", texto: "Cuando empujamos y hacemos sentir mal a las demás para ganar… ganamos el juego, pero perdemos a las amigas. Y eso duele más." },
+
+      { reto: "¿Cuál de estas cosas es MANIPULAR (torcer todo para salirte con la tuya)?", opciones: [
+        { t: "😼 “Vota por mí o no te invito a mi fiesta.”", ok: true },
+        { t: "🙂 “Me gusta mi idea porque brilla; ¿ustedes qué opinan?”", nudge: "Eso es explicar y escuchar, ¡es justo! 🙂 Busca la que presiona o chantajea." },
+        { t: "🗳️ “Votemos y aceptamos lo que salga.”", nudge: "Eso es lo más justo de todo 🗳️ Manipular es forzar el resultado, no aceptarlo." },
+      ] },
+
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Bien visto, Pelu. Ser muy lista es un don. La pregunta es: ¿lo usas para ganar tú sola… o para que TODAS brillen?" },
+
+      { quien: "Pelu", retrato: "pelu", texto: "Nina, tu idea de los deseos me gustó de verdad. ¿Y si las juntamos en vez de elegir solo una?" },
+      { reto: "La idea de Nina te parece floja, pero a ella le encanta. ¿Qué hace una amiga empática?", opciones: [
+        { t: "💜 Unir las dos: un Castillo con Burbujas de los Deseos", ok: true },
+        { t: "🙅 Decirle que su idea es mala para que gane la mía", nudge: "Eso la haría sentir peor 🙅 La empatía busca que TODAS participen." },
+        { t: "🎭 Fingir que votamos, pero hacer la mía igual", nudge: "Eso es manipular otra vez 🎭 Prueba una idea donde todas ganen." },
+      ] },
+
+      { fondo: "feria", narra: "Juntaron todo: un Castillo de Fuego Púrpura ✨ con Burbujas de los Deseos 🫧 flotando en las torres. ¡Quedó increíble, y fue idea de TODAS!" },
+      { quien: "Nina", retrato: "🐈", texto: "¿En serio usamos mi idea? ¡Gracias! Me sentía invisible…" },
+      { quien: "Mia", retrato: "🐱", texto: "Perdón, Nina. Me emocioné tanto con ganar que no te escuché. La feria quedó mejor contigo dentro." },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "Ese es el verdadero hechizo: que nadie se quede afuera. 💜" },
+      { quien: "Pelu", retrato: "pelu", texto: "(Mi cabeza va rápido y mis ideas me encantan… pero cuidar cómo se sienten las demás es la magia más linda.)" },
+      { quien: "Directora Estela", retrato: "🧙‍♀️", texto: "Una idea brillante que hace sentir mal a las demás pierde su brillo. La inteligencia que INCLUYE es la más poderosa de todas." },
+      { narra: "Pelu aprendió que ser lista no es para salirse con la suya, sino para que todas puedan brillar juntas. La empatía también es magia. 💜🎪" },
+      { fin: { estrellas: 20, mensaje: "Capítulo 4 completado. Aprendiste que manipular gana el juego pero pierde amigas — y que tu inteligencia sirve para incluir a todas y que brillen contigo. 💜" } },
     ],
   },
 };

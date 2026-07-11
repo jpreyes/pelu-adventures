@@ -202,6 +202,16 @@ const DATA = {
       requiere: "cap2",
       intro: "🪞 Tercer capítulo. Un espejo mágico le susurra a Pelu cosas feas para hacerla dudar de sí misma. Con Luna, aprenderá a reconocer esa “voz mentirosa” y a responderle con la verdad. Toca para leer y elegir.",
     },
+    {
+      id: "cap4",
+      lugar: "colegio",
+      nombre: "Cap. 4: La Feria de las Brujitas",
+      emoji: "🎪",
+      tipo: "historia",
+      capitulo: "cap4",
+      requiere: "cap3",
+      intro: "🎪 Cuarto capítulo. En la feria del colegio, una amiga intenta manipular al grupo para salirse con la suya. Pelu aprende que ser lista no es para ganar sola, sino para incluir a todas con empatía. Toca para leer y elegir.",
+    },
   ],
 
   // -------- PECES del Lago (colección + valores) --------
