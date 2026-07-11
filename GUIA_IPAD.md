@@ -4,6 +4,17 @@ Pelu Adventures ya es una **PWA** (Progressive Web App): se puede instalar en el
 iPad como si fuera una app de verdad (ícono propio, pantalla completa, y juega
 **sin internet** después de la primera carga).
 
+## 🌐 Ya está publicado en vivo (GitHub Pages)
+
+👉 **https://jpreyes.github.io/pelu-adventures/**
+
+Ábrelo en cualquier dispositivo. En el iPad, ábrelo en **Safari** → botón **Compartir**
+→ **"Agregar a inicio"**, y queda como app con el ícono de Pelu 🐱. Para compartir
+con las amigas de Cele, solo pásales ese link.
+
+> Se actualiza solo cada vez que hago `git push`. Si ves una versión vieja,
+> refresca (Ctrl/⌘+R o quita y vuelve a agregar el ícono).
+
 ---
 
 ## ✅ Opción A (recomendada): subirlo a una web gratis y abrirlo en el iPad

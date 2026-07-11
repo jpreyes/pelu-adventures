@@ -60,6 +60,10 @@ const Estado = {
     // Asegura campos nuevos si el save es viejo
     const base = this.nuevo();
     for (const k in base) if (!(k in this.data)) this.data[k] = base[k];
+    // Abre cualquier lugar marcado como desbloqueado (para saves viejos)
+    DATA.lugares.forEach(l => {
+      if (l.desbloqueado && !this.data.poseidos.lugares.includes(l.id)) this.data.poseidos.lugares.push(l.id);
+    });
   },
 
   guardar() {

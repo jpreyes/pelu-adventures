@@ -66,8 +66,8 @@ const DATA = {
     { id: "cuarto",  nombre: "Cuarto Secreto",     emoji: "🗝️", desbloqueado: true,  color: "#efe4ff" },
     { id: "colegio", nombre: "Colegio de Brujitas", emoji: "🏰", desbloqueado: true,  color: "#e4d6ff" },
     { id: "tienda",  nombre: "Tienda del Pueblo",  emoji: "🏪", desbloqueado: true,  color: "#fff4d9" },
-    { id: "bosque",  nombre: "Bosque de Secretos", emoji: "🌲", desbloqueado: false, precio: 15, color: "#d9f0ff" },
-    { id: "playa",   nombre: "Playa Soleada",      emoji: "🏖️", desbloqueado: false, precio: 30, color: "#fff0d9" },
+    { id: "bosque",  nombre: "Bosque de Secretos", emoji: "🌲", desbloqueado: true,  precio: 15, color: "#d9f0ff" },
+    { id: "playa",   nombre: "Playa Soleada",      emoji: "🏖️", desbloqueado: true,  precio: 30, color: "#fff0d9" },
   ],
 
   /* ============================================================
