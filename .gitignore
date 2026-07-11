@@ -1,0 +1,11 @@
+# Configuración local de Claude Code (personal, no compartir)
+.claude/settings.local.json
+
+# Basura del sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporales / logs
+*.log
+*.tmp

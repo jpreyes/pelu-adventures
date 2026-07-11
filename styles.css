@@ -1,0 +1,417 @@
+/* ============================================================
+   PELU ADVENTURES — Estilos
+   Look tierno, colorido y con botones grandes para niñas.
+   ============================================================ */
+
+:root {
+  --rosa: #ff7eb6;
+  --rosa-claro: #ffd9ec;
+  --morado: #b388ff;
+  --amarillo: #ffd54a;
+  --verde: #5fd28a;
+  --azul: #6ec6ff;
+  --texto: #5a3d5c;
+  --sombra: 0 6px 0 rgba(0,0,0,.12);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  font-family: "Comic Sans MS", "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  color: var(--texto);
+  background: linear-gradient(160deg, #fff4fb 0%, #f0f8ff 60%, #fff8e8 100%);
+  min-height: 100vh;
+  user-select: none;
+}
+
+#app { max-width: 540px; margin: 0 auto; padding: 12px; }
+
+h1 { font-size: 1.7rem; text-align: center; margin: .3em 0; }
+h2 { font-size: 1.2rem; text-align: center; color: var(--rosa); }
+.sub { text-align: center; color: #9b7d9e; margin-top: 0; }
+
+/* ---------- Barra superior ---------- */
+.barra {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff; border-radius: 22px; padding: 8px 14px;
+  box-shadow: var(--sombra); margin-bottom: 12px;
+}
+.monedas {
+  font-size: 1.4rem; font-weight: bold; color: var(--amarillo);
+  background: #fff7d6; padding: 4px 16px; border-radius: 18px;
+}
+.monedas span { color: var(--texto); }
+.btn-redondo {
+  font-size: 1.4rem; width: 48px; height: 48px; border: none;
+  border-radius: 50%; background: var(--rosa-claro); cursor: pointer;
+  box-shadow: var(--sombra); transition: transform .1s;
+}
+.btn-redondo:active { transform: scale(.9); }
+
+/* ---------- Escena ---------- */
+.escena {
+  background: #fff; border-radius: 26px; padding: 18px;
+  box-shadow: var(--sombra); position: relative; animation: aparecer .25s ease;
+}
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px);} to {opacity:1;transform:none;} }
+
+.volver {
+  background: var(--morado); color: #fff; border: none; font-size: 1rem;
+  padding: 8px 16px; border-radius: 16px; cursor: pointer; box-shadow: var(--sombra);
+  font-family: inherit;
+}
+.volver:active { transform: scale(.95); }
+
+/* ---------- Botones ---------- */
+.btn {
+  font-family: inherit; font-size: 1.1rem; border: none; cursor: pointer;
+  background: var(--rosa); color: #fff; padding: 12px 20px; border-radius: 20px;
+  box-shadow: var(--sombra); margin: 8px 6px; transition: transform .1s;
+}
+.btn.grande { font-size: 1.3rem; padding: 16px 28px; }
+.btn.rojo { background: #ff6b6b; }
+.btn:active { transform: translateY(3px); box-shadow: none; }
+.pulso { animation: pulso 1s infinite; }
+@keyframes pulso { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
+
+/* ---------- Pelu (gatita blanca SVG + accesorios) ---------- */
+.pelu {
+  position: relative; display: inline-block; margin: 0 auto; line-height: 0;
+}
+.pelu-svg { position: relative; z-index: 2; }
+.pelu-svg svg { display: block; width: 100%; height: auto; }
+.pelu .acc { position: absolute; transform: translateX(-50%); line-height: 1; }
+.pelu .a-sombrero { z-index: 3; }
+.pelu .a-gafas    { z-index: 4; }
+.pelu .a-collar   { z-index: 3; }
+.pelu .a-mochila  { z-index: 1; }
+.saludo { text-align: center; }
+.saludo .pelu { animation: flotar 2.5s ease-in-out infinite; }
+@keyframes flotar { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+
+/* ---------- Mapa ---------- */
+.grid-lugares {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;
+}
+.lugar {
+  border-radius: 22px; padding: 18px 10px; text-align: center; cursor: pointer;
+  box-shadow: var(--sombra); transition: transform .12s; position: relative;
+}
+.lugar:active { transform: scale(.95); }
+.lugar-emoji { font-size: 3rem; }
+.lugar-nombre { font-weight: bold; margin-top: 6px; }
+.lugar.cerrado { filter: grayscale(.6) brightness(.95); }
+.candado {
+  position: absolute; bottom: 8px; left: 0; right: 0; font-size: .9rem;
+  background: rgba(255,255,255,.85); border-radius: 12px; margin: 0 16px; padding: 2px;
+}
+
+/* ---------- Lugar / aventuras ---------- */
+.lugar-cabecera { text-align: center; }
+.lugar-emoji-grande { font-size: 3.5rem; }
+.lista-aventuras { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.aventura {
+  display: flex; align-items: center; gap: 12px; background: #fff7fc;
+  border: 3px solid var(--rosa-claro); border-radius: 20px; padding: 12px;
+  cursor: pointer; transition: transform .1s;
+}
+.aventura:active { transform: scale(.97); }
+.aventura-emoji { font-size: 2.4rem; }
+.aventura-nombre { font-weight: bold; font-size: 1.1rem; }
+.aventura-tag { font-size: .8rem; padding: 2px 10px; border-radius: 12px; display: inline-block; margin-top: 4px; }
+.tag-matematicas { background:#ffe1ec; } .tag-ingles { background:#e1f0ff; }
+.tag-logica { background:#e9e1ff; } .tag-dinero { background:#fff3cf; } .tag-decision { background:#ffe1e1; }
+.nueva { margin-left: auto; background: var(--verde); color:#fff; padding:4px 10px; border-radius:12px; font-size:.8rem; }
+.hechas { margin-left: auto; background: var(--amarillo); color:#fff; padding:4px 10px; border-radius:12px; font-weight:bold; }
+
+/* ---------- Casa / habitación ---------- */
+.habitacion {
+  background: linear-gradient(#fff7e8, #ffe9d6); border-radius: 22px;
+  min-height: 220px; padding: 14px; position: relative; margin: 14px 0;
+  border: 4px solid #ffd9b3; overflow: hidden;
+}
+.habitacion.mini { min-height: 130px; }
+.muebles { display: flex; flex-wrap: wrap; gap: 8px; font-size: 2.4rem; }
+.pelu-en-casa { text-align: center; margin-top: 10px; }
+.mascotas-zona { display:flex; gap:10px; font-size:2rem; position:absolute; bottom:10px; right:14px; }
+.mascota-libre { animation: saltar 1.6s ease-in-out infinite; display:inline-block; }
+@keyframes saltar { 0%,100%{transform:translateY(0);} 40%{transform:translateY(-10px);} }
+.acciones-casa { display:flex; justify-content:center; flex-wrap:wrap; }
+.acciones-casa.mimos { margin:4px 0; }
+.casa-pista { margin:4px 0 6px; font-size:.85rem; }
+.interactivo { cursor:pointer; transition:transform .1s; }
+.interactivo:active { transform:scale(.88); }
+.muebles .interactivo:hover, .mascota-libre.interactivo:hover { transform:scale(1.12); }
+.pelu-en-casa.interactivo { display:inline-block; }
+.pelu-en-casa.brinca { animation:brincaPelu .5s ease; }
+@keyframes brincaPelu { 0%,100%{transform:translateY(0);} 40%{transform:translateY(-18px);} 70%{transform:translateY(0) scale(1.05);} }
+/* burbuja de diálogo */
+.burbuja {
+  position:absolute; top:6px; left:50%; transform:translate(-50%,6px);
+  background:#fff; color:var(--texto); border:3px solid var(--rosa-claro); border-radius:16px;
+  padding:6px 14px; font-size:1rem; font-weight:bold; white-space:nowrap; z-index:5;
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; box-shadow:var(--sombra);
+}
+.burbuja.ver { opacity:1; transform:translate(-50%,0); }
+.burbuja::after { content:""; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
+  border:7px solid transparent; border-top-color:#fff; }
+/* emojis que flotan al interactuar */
+.mimo-emoji { position:absolute; bottom:30%; font-size:1.6rem; pointer-events:none; z-index:6;
+  animation:mimoSube 1.3s ease-out forwards; }
+@keyframes mimoSube { 0%{opacity:0; transform:translateY(0) scale(.6);} 20%{opacity:1;}
+  100%{opacity:0; transform:translateY(-90px) scale(1.3);} }
+
+/* ---------- Clóset ---------- */
+.preview-pelu { text-align:center; margin: 10px 0 18px; }
+.fila-slot { display:flex; align-items:center; gap:10px; margin:8px 0; }
+.slot-nombre { width: 90px; font-size:.85rem; font-weight:bold; }
+.opciones-ropa { display:flex; gap:8px; flex-wrap:wrap; }
+.opcion-ropa {
+  font-size:1.8rem; width:54px; height:54px; display:flex; align-items:center; justify-content:center;
+  background:#f6f0ff; border-radius:16px; cursor:pointer; border:3px solid transparent; transition:transform .1s;
+}
+.opcion-ropa.activa { border-color: var(--rosa); background:#ffe6f4; }
+.opcion-ropa:active { transform: scale(.9); }
+
+/* ---------- Decorar ---------- */
+.grid-muebles, .grid-tienda {
+  display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0;
+}
+.opcion-mueble {
+  position:relative; font-size:2.2rem; background:#f0fff4; border-radius:18px;
+  height:80px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  border:3px solid transparent;
+}
+.opcion-mueble.activa { border-color: var(--verde); background:#dcffe6; }
+.opcion-mueble .check { position:absolute; top:4px; right:8px; font-size:1rem; color:var(--verde); font-weight:bold; }
+
+/* ---------- Tienda ---------- */
+.tabs { display:flex; gap:8px; justify-content:center; margin:10px 0; flex-wrap:wrap; }
+.tab { font-family:inherit; border:none; background:#eee; padding:8px 14px; border-radius:16px; cursor:pointer; font-size:.95rem; }
+.tab.activa { background: var(--morado); color:#fff; }
+.producto {
+  background:#fff; border:3px solid var(--rosa-claro); border-radius:18px; padding:10px;
+  text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.producto.comprado { opacity:.7; border-color:var(--verde); }
+.producto-emoji { font-size:2.6rem; }
+.producto-nombre { font-size:.82rem; font-weight:bold; min-height:2.4em; }
+.btn-comprar { font-family:inherit; border:none; background:var(--amarillo); color:var(--texto); font-weight:bold;
+  padding:6px 14px; border-radius:14px; cursor:pointer; font-size:1rem; }
+.btn-comprar.no { background:#eee; color:#bbb; }
+.etiqueta-tengo { color:var(--verde); font-weight:bold; font-size:.9rem; }
+
+/* ---------- Aventuras (retos) ---------- */
+.aventura-escena { text-align:center; }
+.av-intro .av-emoji-grande { font-size:4rem; }
+.av-texto { font-size:1.1rem; line-height:1.5; margin:14px auto; max-width:90%; }
+.reto-escena { font-size:2.6rem; margin:18px 0; min-height:80px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:10px; }
+.grupo { background:#fff7fc; border-radius:16px; padding:8px 14px; }
+.grande-emoji { font-size:2.2rem; line-height:1.4; }
+.mas { font-size:2rem; }
+.reto-pregunta { font-size:1.3rem; font-weight:bold; }
+.reto-opciones { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+.opcion-reto {
+  font-family:inherit; font-size:1.6rem; min-width:80px; padding:16px 20px; border:none;
+  background:var(--azul); color:#fff; border-radius:20px; cursor:pointer; box-shadow:var(--sombra);
+  transition:transform .1s;
+}
+.opcion-reto:active { transform: translateY(3px); }
+.opcion-reto.correcta { background:var(--verde); animation: brinco .4s; }
+.opcion-reto.incorrecta { background:#ff8a8a; }
+@keyframes brinco { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
+.msg-ok { color:var(--verde); font-size:1.3rem; font-weight:bold; }
+.msg-no { color:#e57373; font-size:1.05rem; }
+
+/* Matemáticas: ecuación grande */
+.ecuacion { font-size:3rem; font-weight:bold; color:var(--texto); letter-spacing:4px; }
+.ecuacion span { color:var(--rosa); margin:0 6px; }
+/* Inglés */
+.ingles-objeto { font-size:4rem; } .ingles-es { font-size:1.1rem; }
+.ingles-frase { font-size:1.6rem; font-weight:bold; background:#eef6ff; border-radius:16px; padding:14px 18px; color:var(--texto); }
+.reto-opciones .opcion-reto { font-size:1.15rem; min-width:auto; }
+/* Lógica */
+.secuencia { display:flex; gap:8px; font-size:2.4rem; justify-content:center; flex-wrap:wrap; }
+.secuencia .hueco { background:#fff0f6; border-radius:12px; padding:0 6px; animation:pulso 1s infinite; }
+/* Dinero */
+.precio-cartel { font-size:1.2rem; background:#fff3cf; border-radius:14px; padding:6px 14px; display:inline-block; margin-top:8px; }
+.producto-mercado .grande-emoji { font-size:4rem; }
+
+/* Final de aventura */
+.av-final .premio { font-size:2rem; color:var(--amarillo); font-weight:bold; margin:10px; }
+.tesoro { font-size:1.2rem; color:var(--morado); font-weight:bold; }
+.botones-final { display:flex; justify-content:center; flex-wrap:wrap; }
+
+/* ---------- Ajustes ---------- */
+.ajuste { background:#faf5ff; border-radius:18px; padding:14px; margin:12px 0; }
+.botones-edad { display:flex; gap:8px; flex-wrap:wrap; }
+.btn-edad { font-family:inherit; width:46px; height:46px; border:none; border-radius:14px; background:#eee; font-size:1.1rem; cursor:pointer; }
+.btn-edad.activa { background:var(--morado); color:#fff; }
+
+/* ---------- Toast ---------- */
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--texto); color:#fff; padding:12px 22px; border-radius:18px;
+  font-size:1rem; opacity:0; transition:all .3s; z-index:50; box-shadow:var(--sombra); max-width:90%;
+}
+.toast.ver { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------- Aventura de plataformas (Phaser) ---------- */
+#juego-phaser { display:none; position:fixed; inset:0; background:#bfe9ff; z-index:60; }
+#phaser-canvas { width:100%; height:100%; }
+#phaser-canvas canvas { display:block; margin:0 auto; }
+#btn-salir-juego {
+  position:fixed; top:12px; right:12px; z-index:62; font-family:inherit; font-size:1rem;
+  background:#ff6b6b; color:#fff; border:none; padding:10px 16px; border-radius:16px;
+  cursor:pointer; box-shadow:var(--sombra);
+}
+#controles-tactiles {
+  position:fixed; bottom:0; left:0; right:0; z-index:62; display:flex;
+  justify-content:space-between; align-items:flex-end; padding:18px; pointer-events:none;
+}
+#controles-tactiles .lado-izq { display:flex; gap:14px; pointer-events:none; }
+#controles-tactiles .ctrl {
+  pointer-events:auto; font-family:inherit; font-size:1.8rem; border:none; color:#fff;
+  background:rgba(123,79,208,.85); width:74px; height:74px; border-radius:50%;
+  box-shadow:var(--sombra); touch-action:none; user-select:none;
+}
+#controles-tactiles .ctrl.salto {
+  width:auto; min-width:120px; height:74px; border-radius:24px; font-size:1.2rem;
+  background:rgba(95,210,138,.9); font-weight:bold;
+}
+#controles-tactiles .cruz-vert { display:flex; flex-direction:column; gap:8px; }
+#controles-tactiles .ctrl.chico { width:60px; height:52px; font-size:1.4rem; }
+#controles-tactiles .ctrl:active { transform:scale(.92); }
+/* En pantallas con teclado, los botones táctiles estorban menos pero siguen sirviendo con mouse */
+
+/* ---------- Perfiles ---------- */
+.perfiles-escena { text-align:center; }
+.grid-perfiles { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:16px; }
+.perfil-card {
+  position:relative; background:#fff7fc; border:3px solid var(--rosa-claro); border-radius:22px;
+  width:130px; padding:18px 10px; cursor:pointer; transition:transform .1s;
+}
+.perfil-card:active { transform:scale(.95); }
+.perfil-card.nuevo { border-style:dashed; background:#f6f0ff; }
+.perfil-avatar { font-size:2.8rem; }
+.perfil-nombre { font-weight:bold; margin-top:6px; word-break:break-word; }
+.perfil-x { position:absolute; top:6px; right:6px; border:none; background:#ffd1d1; color:#c0392b;
+  width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:.8rem; }
+.nombre-input {
+  font-family:inherit; font-size:1.4rem; text-align:center; padding:12px 16px; border:3px solid var(--rosa);
+  border-radius:18px; outline:none; width:80%; max-width:300px; margin:10px auto; display:block; color:var(--texto);
+}
+
+/* ---------- Cocina ---------- */
+.cocina-escena { text-align:center; }
+.cocinera { position:relative; display:inline-block; }
+.gorro-chef { position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:1.6rem; }
+.grid-recetas { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+.receta-card { background:#fff7fc; border:3px solid var(--amarillo); border-radius:20px; width:140px; padding:16px 10px; cursor:pointer; transition:transform .1s; }
+.receta-card:active { transform:scale(.95); }
+.receta-emoji { font-size:3rem; } .receta-nombre { font-weight:bold; } .receta-pasos { font-size:.8rem; color:#9b7d9e; }
+.receta-lista { display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+.paso-receta { background:#faf5ff; border-radius:12px; padding:8px 12px; font-size:1rem; opacity:.6; }
+.paso-receta.actual { opacity:1; border:2px solid var(--rosa); background:#ffe6f4; font-weight:bold; }
+.paso-receta.hecho { opacity:.85; background:#e3ffe9; }
+.paso-cont { float:right; font-weight:bold; }
+.instruccion { font-size:1.2rem; margin:10px 0; }
+.bowl { font-size:3.4rem; position:relative; margin:8px 0; min-height:70px; }
+.bowl-cont { position:absolute; inset:0; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:2px; font-size:1.2rem; }
+.ingredientes-tray { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+.ing-btn, .topping-btn {
+  font-size:2rem; width:64px; height:64px; border:none; border-radius:18px; background:#f6f0ff;
+  cursor:pointer; box-shadow:var(--sombra); transition:transform .1s;
+}
+.ing-btn:active, .topping-btn:active { transform:scale(.9); }
+.sacudir { animation: sacudir .4s; }
+@keyframes sacudir { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-7px);} 75%{transform:translateX(7px);} }
+
+/* mezclar */
+.mezcla-bowl { font-size:4rem; transition:transform .15s; }
+.barra-prog { background:#eee; border-radius:14px; height:24px; overflow:hidden; margin:14px auto; max-width:320px; }
+.barra-prog-fill { background:linear-gradient(90deg,var(--rosa),var(--amarillo)); height:100%; width:0; transition:width .2s; }
+
+/* hornear */
+.horno { margin:20px 0; }
+.horno-pista { position:relative; height:46px; border-radius:14px; margin:0 auto; max-width:360px;
+  background:linear-gradient(90deg,#ff8a8a,#ffd54a 25%,#7ed957 40%,#7ed957 60%,#ffd54a 75%,#ff8a8a); overflow:hidden; }
+.zona-perfecta { position:absolute; left:40%; width:20%; top:0; bottom:0; border:3px dashed #2e7d32; box-sizing:border-box; }
+.aguja { position:absolute; top:-6px; bottom:-6px; left:0; width:6px; background:#5a3d5c; border-radius:3px; box-shadow:0 0 6px #000; }
+
+/* decorar / servir */
+.plato { position:relative; width:200px; height:200px; margin:14px auto; }
+.plato-base { font-size:6rem; }
+.toppings-zona { position:absolute; inset:0; pointer-events:none; }
+.topping-puesto { position:absolute; font-size:1.6rem; animation: pop .3s; }
+@keyframes pop { from{transform:scale(0);} to{transform:scale(1);} }
+.servir-escena { font-size:3rem; display:flex; align-items:center; justify-content:center; gap:14px; }
+.amigo-feliz { font-size:3.4rem; animation: saltar 1.2s ease-in-out infinite; }
+
+/* ---------- Cuarto Secreto (escape room) ---------- */
+.escape-escena { text-align:center; }
+.cuarto {
+  position:relative; width:100%; height:300px; margin:10px 0; border-radius:18px;
+  background:linear-gradient(#efe1ff 0%, #e3d2f7 55%, #cdb79a 55%, #c3aa8c 100%);
+  border:6px solid #a988d6; overflow:hidden; box-shadow:inset 0 -8px 0 rgba(0,0,0,.08);
+}
+.cuarto .obj {
+  position:absolute; transform:translate(-50%,-50%); border:none; background:transparent;
+  font-size:2.6rem; cursor:pointer; display:flex; flex-direction:column; align-items:center;
+  line-height:1; transition:transform .1s;
+}
+.cuarto .obj.grande { font-size:3.4rem; }
+.cuarto .obj:active { transform:translate(-50%,-50%) scale(.9); }
+.cuarto .obj span { font-size:.7rem; color:#5a3d5c; background:#ffffffcc; border-radius:8px; padding:1px 5px; margin-top:2px; }
+.cuarto-pelu { position:absolute; left:26%; bottom:-6px; transform:translateX(-50%); }
+.escape-info { display:flex; justify-content:space-around; flex-wrap:wrap; gap:8px; margin:8px 0; }
+.pistas-track, .inventario { background:#faf5ff; border-radius:14px; padding:8px 14px; font-weight:bold; font-size:1.1rem; }
+.pista-slot { display:inline-block; min-width:1.2em; padding:2px 6px; background:#eee; border-radius:8px; margin:0 2px; }
+.pista-slot.ok { background:var(--verde); color:#fff; }
+
+/* modal */
+.escape-modal { position:fixed; inset:0; z-index:70; background:rgba(40,20,50,.45);
+  display:flex; align-items:center; justify-content:center; padding:16px; animation:aparecer .15s; }
+.escape-modal-caja { background:#fff; border-radius:22px; padding:20px; max-width:340px; width:100%;
+  text-align:center; box-shadow:var(--sombra); }
+.escape-modal-caja h2 { margin-top:0; color:var(--rosa); }
+.cuadro-arte { font-size:2.2rem; line-height:1.4; margin:8px 0; word-break:break-word; }
+.reloj-arte { font-size:3rem; }
+.nota { display:inline-block; background:#fff7cf; border-radius:10px; padding:4px 10px; }
+.cerrar-modal { margin-top:8px; }
+
+/* teclado */
+.display-codigo { font-size:2.4rem; letter-spacing:.3em; font-weight:bold; color:var(--texto);
+  background:#f0eaff; border-radius:14px; padding:8px; margin:10px 0; }
+.keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.tecla { font-family:inherit; font-size:1.5rem; padding:12px; border:none; border-radius:14px;
+  background:var(--azul); color:#fff; cursor:pointer; box-shadow:var(--sombra); }
+.tecla:active { transform:translateY(2px); box-shadow:none; }
+.keypad-acciones { display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
+.escape-libre { font-size:2rem; }
+
+/* ---------- Mundo caminable (overworld) ---------- */
+#mundo-top {
+  position:fixed; top:12px; left:0; right:0; z-index:62; display:flex;
+  justify-content:space-between; align-items:center; padding:0 14px; pointer-events:none;
+}
+#mundo-top .mundo-monedas, #mundo-top button { pointer-events:auto; }
+.mundo-monedas {
+  font-family:inherit; font-size:1.3rem; font-weight:bold; color:var(--amarillo);
+  background:#fff7d6; padding:4px 16px; border-radius:14px; box-shadow:var(--sombra);
+}
+.mundo-monedas span { color:var(--texto); }
+#mundo-ajustes { font-size:1.4rem; width:48px; height:48px; border:none; border-radius:12px;
+  background:#fff; box-shadow:var(--sombra); cursor:pointer; }
+.mundo-pista { position:absolute; bottom:96px; left:50%; transform:translateX(-50%);
+  background:#4a3a44cc; color:#fff; font-size:.9rem; padding:6px 12px; border-radius:12px; white-space:nowrap; }
+/* d-pad */
+#controles-tactiles .dpad { display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none; }
+#controles-tactiles .dpad-mid { display:flex; gap:44px; }
+#controles-tactiles .dpad .ctrl { pointer-events:auto; }
+
+/* ---------- Confeti ---------- */
+#confeti { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:40; }
+.confeti-pieza { position:absolute; top:-30px; animation: caer 1.5s ease-in forwards; }
+@keyframes caer { to { transform: translateY(110vh) rotate(360deg); opacity:0; } }
