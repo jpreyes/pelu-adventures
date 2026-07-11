@@ -44,6 +44,7 @@ const Aventura = {
     if (t === "pesca")       return PeluFish.start(this.actual.lugar);
     if (t === "buceo")       return PeluSwim.start(this.actual.lugar);
     if (t === "escape")      return PeluEscape.start(this.actual.lugar);
+    if (t === "historia")    return Historia.start(this.actual.capitulo, this.actual.lugar);
   },
 
   // Marco común para mostrar un reto con opciones

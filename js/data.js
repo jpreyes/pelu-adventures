@@ -64,6 +64,7 @@ const DATA = {
     { id: "cocina",  nombre: "Cocina Mágica",      emoji: "🧁", desbloqueado: true,  color: "#fff0e0" },
     { id: "lago",    nombre: "Lago Tranquilo",     emoji: "🎣", desbloqueado: true,  color: "#d9f0ff" },
     { id: "cuarto",  nombre: "Cuarto Secreto",     emoji: "🗝️", desbloqueado: true,  color: "#efe4ff" },
+    { id: "colegio", nombre: "Colegio de Brujitas", emoji: "🏰", desbloqueado: true,  color: "#e4d6ff" },
     { id: "tienda",  nombre: "Tienda del Pueblo",  emoji: "🏪", desbloqueado: true,  color: "#fff4d9" },
     { id: "bosque",  nombre: "Bosque de Secretos", emoji: "🌲", desbloqueado: false, precio: 15, color: "#d9f0ff" },
     { id: "playa",   nombre: "Playa Soleada",      emoji: "🏖️", desbloqueado: false, precio: 30, color: "#fff0d9" },
@@ -171,6 +172,15 @@ const DATA = {
       emoji: "🧩",
       tipo: "escape",
       intro: "¡Pelu quedó encerrada en un cuarto misterioso! Toca los objetos, encuentra 3 pistas escondidas, descubre el código del candado 🔒 y ¡escapa! 🚪 Si te atascas, usa la 💡 pista.",
+    },
+    {
+      id: "cap1",
+      lugar: "colegio",
+      nombre: "Cap. 1: El Primer Día",
+      emoji: "📖",
+      tipo: "historia",
+      capitulo: "cap1",
+      intro: "🏰 La novela de Pelu. Es su primer día en el Colegio de Gatitas Brujitas. Pelu es mitad brujita 🔮 y mitad vampira 🦇 — la única así. Toca para leer y elige qué hace.",
     },
   ],
 

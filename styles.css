@@ -432,6 +432,39 @@ h2 { font-size: 1.2rem; text-align: center; color: var(--rosa); }
 #controles-tactiles .dpad-mid { display:flex; gap:44px; }
 #controles-tactiles .dpad .ctrl { pointer-events:auto; }
 
+/* ---------- Novela gráfica ---------- */
+.novela-escena { text-align:center; }
+.nov-vista {
+  position:relative; width:100%; height:260px; border-radius:18px; overflow:hidden;
+  margin:8px 0; cursor:pointer; box-shadow:var(--sombra); display:flex; align-items:flex-end; justify-content:center;
+}
+.nov-deco-capa { position:absolute; inset:0; pointer-events:none; }
+.nov-deco { position:absolute; font-size:1.6rem; opacity:.85; animation:flotarDeco 3s ease-in-out infinite; }
+@keyframes flotarDeco { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+.nov-portada { position:relative; z-index:2; margin-bottom:6px; }
+.nov-emoji { font-size:5rem; filter:drop-shadow(0 3px 4px rgba(0,0,0,.3)); animation:flotarDeco 2.6s ease-in-out infinite; }
+.nov-portada.es-pelu { margin-bottom:0; }
+
+/* Pelu brujita-vampira */
+.pelu-bruja { position:relative; display:inline-block; margin:0 auto; }
+.pelu-bruja .pelu-svg { position:relative; z-index:2; }
+.pelu-bruja .pelu-svg svg { display:block; width:100%; height:auto; }
+.pelu-bruja .pb-hat { position:absolute; top:-8%; left:50%; transform:translateX(-50%); z-index:3; }
+.pelu-bruja .pb-bat { position:absolute; top:8%; right:-6%; z-index:3; animation:flotarDeco 2s ease-in-out infinite; }
+.pelu-bruja .pb-star { position:absolute; bottom:24%; left:-6%; z-index:3; }
+
+.nov-caja {
+  background:#fff; border:3px solid var(--morado); border-radius:18px; padding:14px 16px;
+  min-height:96px; text-align:left; cursor:pointer; box-shadow:var(--sombra);
+}
+.nov-quien { display:inline-block; background:var(--morado); color:#fff; font-weight:bold;
+  padding:2px 12px; border-radius:12px; font-size:.95rem; margin-bottom:6px; }
+.nov-texto { font-size:1.15rem; line-height:1.5; margin:4px 0; color:var(--texto); }
+.nov-narra { font-size:1.1rem; line-height:1.55; font-style:italic; color:#6a5a72; text-align:center; }
+.nov-continuar { text-align:right; color:var(--morado); font-size:.85rem; margin-top:6px; animation:pulso 1.2s infinite; }
+.nov-opciones { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.nov-opcion { background:var(--rosa); font-size:1.05rem; text-align:center; }
+
 /* ---------- Confeti ---------- */
 #confeti { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:40; }
 .confeti-pieza { position:absolute; top:-30px; animation: caer 1.5s ease-in forwards; }

@@ -46,6 +46,7 @@ const Estado = {
       aventurasHechas: {},                // id -> veces completada
       coleccion: [],                      // tesoros secretos encontrados
       coleccionPeces: [],                 // especies de peces atrapadas (emoji)
+      historia: [],                       // capítulos de la novela completados
     };
   },
 
@@ -319,6 +320,7 @@ const Juego = {
       pesca: "🎣 Pesca",
       buceo: "🤿 Buceo",
       escape: "🧩 Misterio",
+      historia: "📖 Historia",
     })[t] || t;
   },
 

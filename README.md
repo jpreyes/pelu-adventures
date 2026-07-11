@@ -63,6 +63,7 @@ Explorar el mundo  →  Vivir aventuras  →  Ganar estrellas ⭐
 - 🎣 **La Pesca de Pelu** (Lago Tranquilo) → mueve el anzuelo (⬅➡ o tocando el agua), bájalo con ⬇ y atrapa peces; cada especie nueva entra a la **colección de peces** (paciencia, puntería, reflejos y coleccionismo). ¡Evita la basura!
 - 🤿 **El Buceo de Pelu** (Playa) → Pelu se sumerge; muévete ⬅➡ (o desliza) para juntar perlas 🦪 y joyas 💎, recoge burbujas 🫧 para no quedarte sin **aire** y esquiva las medusas 🪼 hasta el cofre del fondo (puntería, anticipación, manejo de un recurso).
 - 🧩 **El Cuarto Secreto** (Cuarto Secreto) → escape room point-and-click: toca objetos, encuentra 3 pistas (una escondida tras una 🔑 llave), descubre el código del candado 🔒 y escapa por la 🚪 (observación, lógica, secuencia, descubrimiento). Con botón 💡 de pista para no atascarse.
+- 📖 **La Novela: Colegio de Gatitas Brujitas** (Colegio) → novela gráfica por capítulos. Pelu es **mitad brujita 🔮 y mitad vampira 🦇** — la única así. Diálogos, decisiones que ramifican y pequeños retos. Tema: *ser diferente es un superpoder* (autoestima, pertenencia, amistad). Cap. 1: "El Primer Día". El guion vive en `js/historia.js` (`Historia.capitulos`); agregar capítulos es copiar la estructura de "beats".
 
 ### 🎨 Estilo
 - Los juegos usan un look **pixel art 2D** (Phaser `pixelArt`). **Pelu** se mantiene como el gatito blanco dibujado a mano (SVG, `js/pelu-sprite.js`) — suave, tanto en el menú como en los juegos.

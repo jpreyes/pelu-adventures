@@ -4,7 +4,7 @@
    Sube el número de versión cuando cambies archivos para que
    se actualice el caché.
    ============================================================ */
-const VERSION = "pelu-v11";
+const VERSION = "pelu-v12";
 const ASSETS = [
   "./",
   "./index.html",
@@ -21,6 +21,7 @@ const ASSETS = [
   "./js/fishing.js",
   "./js/swim.js",
   "./js/escape.js",
+  "./js/historia.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
