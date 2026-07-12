@@ -270,7 +270,7 @@ const Juego = {
     // Si veníamos del mundo caminable, regresamos ahí donde estábamos
     if (typeof Mundo !== "undefined" && Mundo.pendiente) {
       const p = Mundo.pendiente; Mundo.pendiente = null;
-      return Mundo.start(p);
+      return Mundo.reanudar(p);
     }
 
     const lugares = DATA.lugares.map(l => {
@@ -320,7 +320,7 @@ const Juego = {
     }
     if (typeof Mundo !== "undefined" && Mundo.pendiente) {
       const p = Mundo.pendiente; Mundo.pendiente = null;
-      return Mundo.start(p);
+      return Mundo.reanudar(p);
     }
     if (id === "casa")   return this.casa();
     if (id === "tienda") return this.tienda("ropa");

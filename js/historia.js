@@ -29,6 +29,8 @@ const Historia = {
     espejo: { grad: "linear-gradient(160deg,#14121e,#2a2440 70%,#3a3560)", deco: ["🪞", "🕯️", "🕸️", "✨", "🌙"] },
     feria:  { grad: "linear-gradient(160deg,#4a2a5a,#8a4a7a 60%,#d98ab0)", deco: ["🎪", "🎈", "🔮", "✨", "🍬"] },
     lago:   { grad: "linear-gradient(160deg,#1a3a5a,#2a6a9a 65%,#7ec8e8)", deco: ["🌙", "🐟", "🫧", "✨", "🎣"] },
+    cafe:   { grad: "linear-gradient(160deg,#5a3a2a,#a5794a 70%,#e0b878)", deco: ["🧁", "☕", "🍪", "✨", "🍩"] },
+    casita: { grad: "linear-gradient(160deg,#7a4a6a,#b57a9a 70%,#e8b8d0)", deco: ["🏠", "💜", "🧸", "✨", "🪟"] },
   },
 
   start(capId = "cap1", lugar = "colegio") {
@@ -114,6 +116,9 @@ const Historia = {
     const lugar = b.lugar || this.s.lugar;
     this.s.i++;                     // al volver, seguimos en el beat siguiente
     this.esperandoJuego = true;
+    // Actividades DOM (no Phaser): vestir/decorar y tienda
+    if (b.juego === "casa")   { Juego.casa(); return; }
+    if (b.juego === "tienda") { Juego.tienda("ropa"); return; }
     const mod = window[this.modulosJuego[b.juego]];
     if (mod && typeof mod.start === "function") { mod.start(lugar); }
     else { this.esperandoJuego = false; this.render(); }  // fallback: seguir el relato
@@ -408,6 +413,28 @@ const Historia = {
       { quien: "Pelu", retrato: "pelu", texto: "¡Míralos, Luna! Los voy a cuidar muy bien. Gracias por pescar conmigo. 💜" },
       { narra: "Pelu guardó sus peces en la colección del Lago. Otra linda tarde de vacaciones de invierno. ❄️🐟" },
       { fin: { estrellas: 3, mensaje: "Volviste del Lago Brillante con Pelu. Tus peces quedaron en la colección. 🎣✨" } },
+    ],
+
+    cafe_intro: [
+      { fondo: "cafe", narra: "El Café Mágico huele a vainilla y chocolate. Pelu empuja la puertita… ¡tolón! suena la campanita. 🔔" },
+      { quien: "Nina", retrato: "🐈", texto: "¡Pelu! Estoy un poco triste hoy… ¿me ayudas a preparar algo rico para animarnos? 🥺" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡Claro que sí! Un postre hecho con cariño arregla cualquier día. ¡A la cocina! 🧁" },
+      { narra: "Elige la receta, agrega los ingredientes en orden, mezcla y hornea. ¡Tú puedes, chef Pelu! 🍳" },
+      { juego: "cocina", lugar: "cocina" },
+      { fondo: "cafe", narra: "El postre sale calentito y brillante. Nina da el primer mordisco… y sonríe de oreja a oreja. 😋" },
+      { quien: "Nina", retrato: "🐈", texto: "¡Está DELICIOSO! Gracias, Pelu. Ya me siento mucho mejor. 💜" },
+      { quien: "Pelu", retrato: "pelu", texto: "Cocinar juntas es mi parte favorita. ¡Vuelve cuando quieras al Café! ☕" },
+      { fin: { estrellas: 3, mensaje: "Cocinaste algo rico en el Café Mágico y alegraste a Nina. 🧁✨" } },
+    ],
+
+    casa_intro: [
+      { fondo: "casita", narra: "Pelu llega a su casita del Valle. Todo está tranquilo y calientito. 🏠💜" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡Hogar dulce hogar! Tengo ganas de probarme ropa nueva y ordenar mi cuarto. ¿Me acompañas?" },
+      { narra: "Vístela a tu gusto y decora las habitaciones: arrastra los objetos y hazle mimos a Pelu. 🧸👗" },
+      { juego: "casa", lugar: "casa" },
+      { fondo: "casita", narra: "Con la casa ordenada y un look nuevo, Pelu se acurruca feliz en su rincón favorito. 🌙" },
+      { quien: "Pelu", retrato: "pelu", texto: "Mi casita es mi lugar seguro. Aquí siempre puedo ser yo misma. 💜" },
+      { fin: { estrellas: 3, mensaje: "Pasaste un rato lindo en casa con Pelu. 🏠✨" } },
     ],
   },
 };
