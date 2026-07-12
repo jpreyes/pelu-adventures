@@ -33,7 +33,7 @@ const Estado = {
   nuevo() {
     return {
       estrellas: 20,                 // monedas iniciales para empezar a jugar
-      edad: 9,                       // ajusta la dificultad; crece con ella
+      edad: 10,                      // ajusta la dificultad; crece con ella
       poseidos: {                    // ids de cosas desbloqueadas
         ropa: DATA.ropa.filter(x => x.inicial).map(x => x.id),
         muebles: DATA.muebles.filter(x => x.inicial).map(x => x.id),

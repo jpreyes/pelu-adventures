@@ -118,12 +118,13 @@ const Aventura = {
 
     // Elige operación según la edad — sube fuerte para altas capacidades
     let ops;
-    if (edad <= 5) ops = ["contar"];
-    else if (edad <= 7) ops = ["sumar", "restar"];
-    else if (edad <= 9) ops = ["sumar", "restar", "multiplicar", "dividir"];
-    else if (edad === 10) ops = ["multiplicar", "dividir", "combo", "algebra"];
-    else if (edad === 11) ops = ["multi2", "dividir", "combo3", "algebra", "fraccion"];
-    else ops = ["multi2", "fraccion", "algebra2", "potencia", "combo3"];
+    if (edad <= 5) ops = ["contar", "sumar"];
+    else if (edad <= 7) ops = ["sumar", "restar", "multiplicar"];
+    else if (edad === 8) ops = ["sumar", "restar", "multiplicar", "dividir", "combo"];
+    else if (edad === 9) ops = ["multiplicar", "dividir", "combo", "algebra", "multi2", "fraccion"];
+    else if (edad === 10) ops = ["multi2", "dividir", "combo3", "algebra", "algebra2", "fraccion", "orden"];
+    else if (edad === 11) ops = ["multi2", "combo3", "algebra2", "fraccion", "potencia", "porcentaje", "orden"];
+    else ops = ["multi2", "fraccion", "algebra2", "potencia", "combo3", "porcentaje", "orden"];
     const op = rnd(ops);
 
     let respuesta, escena, pregunta, premio = 4;
@@ -133,12 +134,13 @@ const Aventura = {
       escena = `<div class="grupo grande-emoji">${icono.repeat(respuesta)}</div>`;
       pregunta = `¿Cuántos cuentas?`;
     } else if (op === "sumar") {
-      const n1 = ri(2, edad <= 7 ? 9 : 25), n2 = ri(2, edad <= 7 ? 9 : 25);
+      const top = edad <= 5 ? 9 : edad <= 7 ? 20 : 75;
+      const n1 = ri(2, top), n2 = ri(2, top);
       respuesta = n1 + n2;
       escena = `<div class="ecuacion">${n1} <span>+</span> ${n2}</div>`;
       pregunta = `¿Cuánto suma?`;
     } else if (op === "restar") {
-      const n1 = ri(6, edad <= 7 ? 12 : 40), n2 = ri(1, n1);
+      const n1 = ri(6, edad <= 7 ? 18 : 90), n2 = ri(1, n1);
       respuesta = n1 - n2;
       escena = `<div class="ecuacion">${n1} <span>−</span> ${n2}</div>`;
       pregunta = `¿Cuánto queda?`;
@@ -152,11 +154,11 @@ const Aventura = {
       respuesta = res;
       escena = `<div class="ecuacion">${n2 * res} <span>÷</span> ${n2}</div>`;
       pregunta = `¿Cuánto da?`; premio = 6;
-    } else if (op === "multi2") { // 2 dígitos × 1 dígito
-      const n1 = ri(12, 29), n2 = ri(3, 9);
+    } else if (op === "multi2") { // 2 dígitos × 1-2 dígitos
+      const n1 = ri(13, edad >= 12 ? 49 : 29), n2 = ri(edad >= 11 ? 6 : 3, edad >= 12 ? 19 : 9);
       respuesta = n1 * n2;
       escena = `<div class="ecuacion">${n1} <span>×</span> ${n2}</div>`;
-      pregunta = `¿Cuánto es?`; premio = 9;
+      pregunta = `¿Cuánto es?`; premio = 10;
     } else if (op === "algebra") { // ? + b = c   ó   a × ? = c
       if (ri(0, 1)) { const b = ri(3, 20), res = ri(3, 20); respuesta = res;
         escena = `<div class="ecuacion"><span>?</span> + ${b} = ${res + b}</div>`;
@@ -182,6 +184,18 @@ const Aventura = {
       } else { const a = ri(2, 5); respuesta = a * a * a;
         escena = `<div class="ecuacion">${a}³</div>`; pregunta = `¿Cuánto es ${a} al cubo?`; }
       premio = 10;
+    } else if (op === "porcentaje") { // 10/25/50/75% de N (resultado entero)
+      const p = rnd([10, 25, 50, 75]);
+      const mult = p === 10 ? 10 : p === 50 ? 2 : 4;
+      const N = mult * ri(2, 12);
+      respuesta = N * p / 100;
+      escena = `<div class="ecuacion">${p}% <span>de</span> ${N}</div>`;
+      pregunta = `¿Cuánto es ese porcentaje?`; premio = 12;
+    } else if (op === "orden") { // orden de operaciones: a + b × c
+      const a = ri(3, 15), b = ri(2, 9), c = ri(2, 9);
+      respuesta = a + b * c;
+      escena = `<div class="ecuacion">${a} <span>+</span> ${b} <span>×</span> ${c}</div>`;
+      pregunta = `Ojo: primero la ×, después la +. ¿Cuánto da? 🔎`; premio = 12;
     } else { // combo de dos pasos: a × b + c
       const n1 = ri(2, 9), n2 = ri(2, 9), n3 = ri(2, 12);
       respuesta = n1 * n2 + n3;
@@ -253,11 +267,11 @@ const Aventura = {
     const edad = Estado.data.edad;
 
     // Mayores: secuencias numéricas (+n, ×2, cuadrados, Fibonacci…)
-    if (edad >= 7 && Math.random() < 0.65) {
+    if (edad >= 7 && Math.random() < (edad >= 9 ? 0.8 : 0.65)) {
       const ri = (mn, mx) => mn + Math.floor(Math.random() * (mx - mn + 1));
       let tipos = ["suma", "resta"];
-      if (edad >= 9) tipos = tipos.concat(["doble", "salto"]);
-      if (edad >= 11) tipos = tipos.concat(["triple", "cuadrados", "fibonacci"]);
+      if (edad >= 8) tipos = tipos.concat(["doble", "salto"]);
+      if (edad >= 9) tipos = tipos.concat(["triple", "cuadrados", "fibonacci"]);
       const tipo = rnd(tipos);
       let inicio, paso, seq = [], respuesta, regla;
       if (tipo === "doble") {
