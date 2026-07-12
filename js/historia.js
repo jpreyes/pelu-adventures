@@ -28,6 +28,7 @@ const Historia = {
     jardin: { grad: "linear-gradient(160deg,#243a3a,#3a6a5a 70%,#5a8a6a)", deco: ["🌙", "🌿", "🌸", "✨", "🦋"] },
     espejo: { grad: "linear-gradient(160deg,#14121e,#2a2440 70%,#3a3560)", deco: ["🪞", "🕯️", "🕸️", "✨", "🌙"] },
     feria:  { grad: "linear-gradient(160deg,#4a2a5a,#8a4a7a 60%,#d98ab0)", deco: ["🎪", "🎈", "🔮", "✨", "🍬"] },
+    lago:   { grad: "linear-gradient(160deg,#1a3a5a,#2a6a9a 65%,#7ec8e8)", deco: ["🌙", "🐟", "🫧", "✨", "🎣"] },
   },
 
   start(capId = "cap1", lugar = "colegio") {
@@ -45,13 +46,14 @@ const Historia = {
     let b = s.beats[s.i];
     // procesar etiquetas y saltos hasta el próximo beat "visible"
     let guard = 0;
-    while (b && !b.narra && !b.texto && !b.eleccion && !b.reto && !b.fin && guard++ < 200) {
+    while (b && !b.narra && !b.texto && !b.eleccion && !b.reto && !b.fin && !b.juego && guard++ < 200) {
       if (b.ir !== undefined) s.i = s.etiquetas[b.ir]; else s.i++;
       b = s.beats[s.i];
     }
     if (!b) return this.finCap({ estrellas: 10 });
     if (b.fondo) s.fondo = b.fondo;
     if (b.fin) return this.finCap(b.fin);
+    if (b.juego) return this.lanzarJuego(b);   // reto jugable incrustado en el relato
 
     const f = this.fondos[s.fondo] || this.fondos.puerta;
     const deco = f.deco.map((e, i) =>
@@ -100,6 +102,23 @@ const Historia = {
 
   avanzar() { this.s.i++; this.render(); },
   irA(et) { this.s.i = this.s.etiquetas[et]; this.render(); },
+
+  // Lanza un mini-juego incrustado en la novela. Al terminar, el juego vuelve
+  // por Juego.mapa()/entrar(), que detectan esperandoJuego y retoman el relato.
+  esperandoJuego: false,
+  modulosJuego: {
+    plataformas: "PeluPlatformer", carrera: "PeluRace", cocina: "PeluCook",
+    pesca: "PeluFish", buceo: "PeluSwim", escape: "PeluEscape",
+  },
+  lanzarJuego(b) {
+    const lugar = b.lugar || this.s.lugar;
+    this.s.i++;                     // al volver, seguimos en el beat siguiente
+    this.esperandoJuego = true;
+    const mod = window[this.modulosJuego[b.juego]];
+    if (mod && typeof mod.start === "function") { mod.start(lugar); }
+    else { this.esperandoJuego = false; this.render(); }  // fallback: seguir el relato
+  },
+  reanudarDesdeJuego() { this.render(); },
 
   elegir(i) {
     const b = this.s.beats[this.s.i];
@@ -372,6 +391,23 @@ const Historia = {
       { quien: "Pelu", retrato: "pelu", texto: "¡No puedo esperar! Nuestra primera aventura de invierno juntas. 💜❄️" },
       { narra: "Y así, con la primera nevada cayendo sobre el colegio, empiezan las vacaciones de invierno de Pelu… ❄️🏰" },
       { fin: { estrellas: 20, mensaje: "Capítulo 4 completado. Aprendiste que manipular gana el juego pero pierde amigas — y que tu inteligencia sirve para incluir a todas. ¡Empiezan las vacaciones de invierno! ❄️ No te pierdas las aventuras que vienen… ⛄✨" } },
+    ],
+
+    /* ========================================================
+       MINI-NOVELAS POR LUGAR: una historia corta que ENVUELVE
+       un mini-juego. Estructura: intro → { juego } → cierre.
+       Plantilla para replicar en cada tarjeta del mundo.
+       ======================================================== */
+    lago_pesca: [
+      { fondo: "lago", narra: "Es una tarde de vacaciones. Pelu llega al Lago Brillante, donde el agua guarda peces de todos los colores. 🎣" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡Quiero pescar el pececito más lindo para mi colección! ¿Me acompañas?" },
+      { quien: "Luna", retrato: "🐈‍⬛", texto: "¡Claro! Yo te aviso si veo uno raro. Baja el anzuelo con calma y paciencia… ¡como aprendiste! 💜" },
+      { narra: "Mueve el anzuelo con las flechas, baja a atrapar los peces y llena la canasta. ¡A pescar! 🐟" },
+      { juego: "pesca", lugar: "lago" },
+      { fondo: "lago", narra: "¡Splash! Pelu saca la caña del agua con la canasta llena. Los peces brillan bajo la luna. ✨" },
+      { quien: "Pelu", retrato: "pelu", texto: "¡Míralos, Luna! Los voy a cuidar muy bien. Gracias por pescar conmigo. 💜" },
+      { narra: "Pelu guardó sus peces en la colección del Lago. Otra linda tarde de vacaciones de invierno. ❄️🐟" },
+      { fin: { estrellas: 3, mensaje: "Volviste del Lago Brillante con Pelu. Tus peces quedaron en la colección. 🎣✨" } },
     ],
   },
 };

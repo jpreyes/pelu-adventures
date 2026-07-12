@@ -236,6 +236,11 @@ const Juego = {
     const ph = document.getElementById("juego-phaser");
     if (ph) { ph.style.display = "none"; ph.innerHTML = ""; }
     document.getElementById("app").style.display = "";
+    // Si el juego estaba incrustado en una novela, volvemos al relato (no al mapa)
+    if (typeof Historia !== "undefined" && Historia.esperandoJuego) {
+      Historia.esperandoJuego = false;
+      return Historia.reanudarDesdeJuego();
+    }
 
     const lugares = DATA.lugares.map(l => {
       const abierto = Estado.tiene("lugares", l.id);
@@ -276,6 +281,12 @@ const Juego = {
 
   /* ---------- ENTRAR A UN LUGAR ---------- */
   entrar(id) {
+    // Si el juego estaba incrustado en una novela (cocina/escape vuelven por aquí),
+    // retomamos el relato en vez de ir al lugar.
+    if (typeof Historia !== "undefined" && Historia.esperandoJuego) {
+      Historia.esperandoJuego = false;
+      return Historia.reanudarDesdeJuego();
+    }
     if (id === "casa")   return this.casa();
     if (id === "tienda") return this.tienda("ropa");
     return this.lugar(id);
@@ -305,7 +316,7 @@ const Juego = {
           <div class="aventura-emoji">${a.emoji}</div>
           <div>
             <div class="aventura-nombre">${a.nombre}</div>
-            <div class="aventura-tag tag-${a.tipo}">${this.nombreTipo(a.tipo)}</div>
+            <div class="aventura-tag tag-${a.tipo}">${a.etiqueta || this.nombreTipo(a.tipo)}</div>
           </div>
           ${hechas ? `<div class="hechas">✓${hechas}</div>` : `<div class="nueva">¡Nueva!</div>`}
         </div>`;

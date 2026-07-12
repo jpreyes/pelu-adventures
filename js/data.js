@@ -154,8 +154,10 @@ const DATA = {
       lugar: "lago",
       nombre: "La Pesca de Pelu",
       emoji: "🐟",
-      tipo: "pesca",
-      intro: "¡Pelu va a pescar! Mueve el anzuelo con ⬅➡, baja con ⬇ (o toca el agua) y atrapa peces. Cada especie nueva entra a tu colección. ¡Cuidado con la basura! 🥾",
+      tipo: "historia",
+      capitulo: "lago_pesca",
+      etiqueta: "🎣 Pesca",
+      intro: "🎣 Una tarde de vacaciones en el Lago Brillante. Acompaña a Pelu en una pequeña historia… ¡y pesca de verdad! Mueve el anzuelo con ⬅➡, baja con ⬇ y atrapa peces. Cada especie nueva entra a tu colección.",
     },
     {
       id: "bucear",
