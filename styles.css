@@ -467,7 +467,13 @@ h2 { font-size: 1.2rem; text-align: center; color: var(--rosa); }
 #controles-tactiles .dpad .ctrl { pointer-events:auto; }
 
 /* ---------- Novela gráfica ---------- */
-.novela-escena { text-align:center; }
+.novela-escena { text-align:center; position:relative; }
+.saltar-historia {
+  position:absolute; top:0; right:0; z-index:5; font-family:inherit; font-size:.95rem;
+  background:#fff; color:var(--morado); border:2px solid var(--morado);
+  padding:8px 14px; border-radius:16px; cursor:pointer; box-shadow:var(--sombra);
+}
+.saltar-historia:active { transform:scale(.95); }
 .nov-vista {
   position:relative; width:100%; height:260px; border-radius:18px; overflow:hidden;
   margin:8px 0; cursor:pointer; box-shadow:var(--sombra); display:flex; align-items:flex-end; justify-content:center;

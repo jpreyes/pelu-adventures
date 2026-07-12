@@ -91,6 +91,7 @@ const Historia = {
       ${barra()}
       <div class="escena novela-escena">
         <button class="volver" onclick="Historia.salir()">← Salir</button>
+        <button class="saltar-historia" onclick="event.stopPropagation();Historia.saltar()">Saltar ⏭️</button>
         <div class="nov-vista" style="background:${f.grad}" ${clickable}>
           <div class="nov-deco-capa">${deco}</div>
           ${portada}
@@ -104,6 +105,19 @@ const Historia = {
 
   avanzar() { this.s.i++; this.render(); },
   irA(et) { this.s.i = this.s.etiquetas[et]; this.render(); },
+
+  // Saltarse el relato: si viene un mini-juego incrustado, va directo a él;
+  // si no, salta al final del capítulo (sin perderse la parte jugable).
+  saltar() {
+    const b = this.s.beats;
+    for (let j = this.s.i; j < b.length; j++) {
+      if (b[j].juego) { this.s.i = j; return this.render(); }
+    }
+    for (let j = this.s.i; j < b.length; j++) {
+      if (b[j].fin) { this.s.i = j; return this.render(); }
+    }
+    this.finCap({ estrellas: 10 });
+  },
 
   // Lanza un mini-juego incrustado en la novela. Al terminar, el juego vuelve
   // por Juego.mapa()/entrar(), que detectan esperandoJuego y retoman el relato.
