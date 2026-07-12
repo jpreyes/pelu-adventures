@@ -146,9 +146,9 @@ class MundoScene extends Phaser.Scene {
       g.lineStyle(ancho, 0xe6cf94, 1);
       this.trazo(g, pts);
     };
-    camino([[520, 860], [700, 620], [900, 470]], 60);      // casa -> café -> colegio
-    camino([[900, 470], [1240, 720], [1440, 940]], 56);    // colegio -> tienda
-    camino([[520, 860], [1160, 560]], 46);                 // atajo hacia el lago
+    camino([[360, 900], [700, 560], [980, 470]], 58);      // casa -> café -> colegio (por delante)
+    camino([[980, 470], [1240, 720], [1460, 1010]], 56);   // colegio -> tienda
+    camino([[700, 560], [1150, 520]], 44);                 // atajo hacia el lago
 
     // Río (banda azul ondulada, decorativa) + puente
     g.fillStyle(0x4fb0e4, 1);
@@ -260,20 +260,20 @@ class MundoScene extends Phaser.Scene {
   /* --------- CASAS / LUGARES (con entrada) --------- */
   crearLugares() {
     // Casa de Pelu -> vestir y decorar
-    this.casa(360, 800, 0xf6e3c9, 0xd9694f, "🏠", "Casa de Pelu", () =>
-      Mundo.entrarActividad(430, 860, () => Juego.casa()));
+    this.casa(360, 770, 0xf6e3c9, 0xd9694f, "🏠", "Casa de Pelu", () =>
+      Mundo.entrarActividad(415, 880, () => Juego.casa()));
 
     // Colegio de Brujitas -> capítulos de la novela
-    this.casa(900, 360, 0xd7c3f0, 0x7d5ba6, "🏰", "Colegio", () =>
-      Mundo.entrarActividad(900, 470, () => Juego.lugar("colegio")), 1.35);
+    this.casa(980, 320, 0xd7c3f0, 0x7d5ba6, "🏰", "Colegio", () =>
+      Mundo.entrarActividad(1010, 480, () => Juego.lugar("colegio")), 1.35);
 
     // Café Mágico -> cocina
-    this.casa(700, 540, 0xffe0c0, 0xe08a3c, "🧁", "Café", () =>
-      Mundo.entrarActividad(640, 620, () => PeluCook.start("cocina")));
+    this.casa(700, 430, 0xffe0c0, 0xe08a3c, "🧁", "Café", () =>
+      Mundo.entrarActividad(760, 550, () => PeluCook.start("cocina")));
 
     // Tienda del pueblo -> comprar
-    this.casa(1440, 940, 0xf7e2a6, 0xe0a63c, "🏪", "Tienda", () =>
-      Mundo.entrarActividad(1360, 1000, () => Juego.tienda("ropa")));
+    this.casa(1460, 900, 0xf7e2a6, 0xe0a63c, "🏪", "Tienda", () =>
+      Mundo.entrarActividad(1450, 1010, () => Juego.tienda("ropa")));
 
     // Lago -> pesca (zona en el muelle)
     this.zonas.push({
@@ -301,20 +301,20 @@ class MundoScene extends Phaser.Scene {
       fontFamily: "system-ui, sans-serif", fontSize: "18px", color: "#fff",
       stroke: "#00000055", strokeThickness: 4,
     }).setOrigin(0.5).setDepth(9000);
-    // colisión del cuerpo (para no atravesar la casa)
-    this.muro(x, y + 6, w * 0.9, h * 0.8);
+    // colisión del cuerpo COMPLETO (para que Pelu no se meta bajo el borde y quede tapada)
+    this.muro(x, y, w * 0.96, h);
     // zona de entrada frente a la puerta
     this.zonas.push({ x: x + w / 2 - 20, y: y + h / 2 + 26, r: 80, tipo: "lugar", label: `Entrar: ${nombre}`, run });
   }
 
   /* --------- PERSONAJES (hablar) --------- */
   crearNPCs() {
-    this.npc(980, 440, "🧙‍♀️", "Directora Estela", [
+    this.npc(910, 470, "🧙‍♀️", "Directora Estela", [
       "¡Hola, Pelu! Bienvenida al valle.",
       "En el Colegio te esperan nuevas aventuras… entra cuando quieras. 🏰",
       "Recuerda: ser diferente es tu superpoder. ✨",
     ]);
-    this.npc(1080, 400, "🐱", "Mia", [
+    this.npc(1040, 430, "🐱", "Mia", [
       "Hey, Pelu. Perdón por lo de la feria…",
       "Aprendí que ganar sola no es tan divertido. ¿Jugamos juntas? 💜",
     ]);
@@ -367,7 +367,8 @@ class MundoScene extends Phaser.Scene {
     // pequeño rebote al caminar
     const mov = vx || vy;
     this.pelu.setScale(0.34, 0.34 + (mov ? Math.abs(Math.sin(this.time.now / 90)) * 0.03 : 0));
-    this.pelu.setDepth(this.pelu.y);
+    // profundidad por las PATAS (no el centro): así pasa por delante de casas/árboles
+    this.pelu.setDepth(this.pelu.y + 24);
 
     // Zona más cercana en rango
     let cerca = null, dmin = 1e9;
