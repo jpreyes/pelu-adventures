@@ -124,6 +124,19 @@ h2 { font-size: 1.2rem; text-align: center; color: var(--rosa); }
 .tag-logica { background:#e9e1ff; } .tag-dinero { background:#fff3cf; } .tag-decision { background:#ffe1e1; }
 .nueva { margin-left: auto; background: var(--verde); color:#fff; padding:4px 10px; border-radius:12px; font-size:.8rem; }
 .hechas { margin-left: auto; background: var(--amarillo); color:#fff; padding:4px 10px; border-radius:12px; font-weight:bold; }
+/* ---------- Láminas del inicio (Historia / Minijuegos) ---------- */
+.laminas { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-top:18px; }
+.lamina {
+  flex:1 1 260px; max-width:360px; border-radius:26px; padding:26px 22px; cursor:pointer;
+  color:#fff; box-shadow:var(--sombra); transition:transform .12s; text-align:center;
+}
+.lamina:active { transform:scale(.97); }
+.lamina .lamina-emoji { font-size:4rem; line-height:1; }
+.lamina h2 { margin:8px 0 6px; font-size:1.6rem; }
+.lamina p { font-size:1rem; opacity:.95; }
+.lam-historia { background:linear-gradient(160deg,#7b4fd0,#b06ad0 70%,#e08ab0); }
+.lam-juegos   { background:linear-gradient(160deg,#3aa6d0,#5fd28a 75%,#9ad86a); }
+
 .aventura.bloqueada { background:#efeaf2; border-color:#d9cfe2; opacity:.72; }
 .aventura.bloqueada .aventura-nombre { color:#8a7f97; }
 .aventura.bloqueada .aventura-tag { background:#e2d9ec; color:#7a6f87; }
@@ -307,6 +320,24 @@ h2 { font-size: 1.2rem; text-align: center; color: var(--rosa); }
 #controles-tactiles .cruz-vert { display:flex; flex-direction:column; gap:8px; }
 #controles-tactiles .ctrl.chico { width:60px; height:52px; font-size:1.4rem; }
 #controles-tactiles .ctrl:active { transform:scale(.92); }
+
+/* ---------- MUNDO caminable: D-pad + botón acción ---------- */
+#mundo-dpad {
+  position:fixed; left:16px; bottom:20px; z-index:62;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+#mundo-dpad .mfila { display:flex; gap:56px; }
+#mundo-dpad .mctrl, #mundo-accion {
+  pointer-events:auto; font-family:inherit; border:none; color:#fff;
+  background:rgba(123,79,208,.85); width:66px; height:66px; border-radius:50%;
+  font-size:1.6rem; box-shadow:var(--sombra); touch-action:none; user-select:none;
+}
+#mundo-dpad .mctrl:active, #mundo-accion:active { transform:scale(.92); }
+#mundo-accion {
+  position:fixed; right:22px; bottom:34px; z-index:62;
+  width:90px; height:90px; font-size:2.2rem; background:rgba(95,210,138,.92);
+}
+
 /* En pantallas con teclado, los botones táctiles estorban menos pero siguen sirviendo con mouse */
 
 /* ---------- Perfiles ---------- */

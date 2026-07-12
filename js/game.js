@@ -142,7 +142,7 @@ function toast(msg) {
 function barra() {
   return `
     <div class="barra">
-      <button class="btn-redondo" onclick="Juego.mapa()">🗺️</button>
+      <button class="btn-redondo" onclick="Juego.inicio()">🏠</button>
       <div class="monedas">⭐ <span>${Estado.data.estrellas}</span></div>
       <button class="btn-redondo" onclick="Juego.ajustes()">⚙️</button>
     </div>`;
@@ -173,7 +173,33 @@ const Juego = {
   iniciar() {
     if (!Perfil.actual()) return this.perfiles();
     Estado.cargar();
-    this.mapa();
+    this.inicio();
+  },
+
+  /* ---------- INICIO: dos láminas (Historia / Minijuegos) ---------- */
+  inicio() {
+    if (typeof Mundo !== "undefined") Mundo.pendiente = null;  // salida deliberada al hub
+    app().innerHTML = `
+      ${barra()}
+      <div class="escena inicio-escena">
+        <div class="saludo">
+          ${dibujarPelu(96)}
+          <h1>Pelu Adventures</h1>
+          <p class="sub">¿Qué hacemos hoy, ${Perfil.actual() || "exploradora"}? 🐾</p>
+        </div>
+        <div class="laminas">
+          <div class="lamina lam-historia" onclick="Mundo.start()">
+            <div class="lamina-emoji">📖</div>
+            <h2>Historia</h2>
+            <p>Camina por el valle de Pelu, habla con tus amigas y vive aventuras. 🗺️</p>
+          </div>
+          <div class="lamina lam-juegos" onclick="Juego.mapa()">
+            <div class="lamina-emoji">🎮</div>
+            <h2>Minijuegos</h2>
+            <p>Entra directo a un reto: pesca, cocina, carrera, lógica y más. ✨</p>
+          </div>
+        </div>
+      </div>`;
   },
 
   /* ---------- PERFILES (varias jugadoras) ---------- */
@@ -241,6 +267,11 @@ const Juego = {
       Historia.esperandoJuego = false;
       return Historia.reanudarDesdeJuego();
     }
+    // Si veníamos del mundo caminable, regresamos ahí donde estábamos
+    if (typeof Mundo !== "undefined" && Mundo.pendiente) {
+      const p = Mundo.pendiente; Mundo.pendiente = null;
+      return Mundo.start(p);
+    }
 
     const lugares = DATA.lugares.map(l => {
       const abierto = Estado.tiene("lugares", l.id);
@@ -286,6 +317,10 @@ const Juego = {
     if (typeof Historia !== "undefined" && Historia.esperandoJuego) {
       Historia.esperandoJuego = false;
       return Historia.reanudarDesdeJuego();
+    }
+    if (typeof Mundo !== "undefined" && Mundo.pendiente) {
+      const p = Mundo.pendiente; Mundo.pendiente = null;
+      return Mundo.start(p);
     }
     if (id === "casa")   return this.casa();
     if (id === "tienda") return this.tienda("ropa");
