@@ -24,6 +24,10 @@ const PeluRace = {
 
   start(lugar = "jardin") {
     this.retornoLugar = lugar;
+    // El rival se pone más rápido con la edad: a los 10 va a ~300 (sin acelerar
+    // Pelu va a 250, así que hay que acelerar Y esquivar bien para ganarle)
+    const edad = (Estado.data && Estado.data.edad) || 10;
+    this.cfg.velRival = 232 + Math.max(0, edad - 6) * 17;
     document.getElementById("app").style.display = "none";
     const cont = document.getElementById("juego-phaser");
     cont.style.display = "block";

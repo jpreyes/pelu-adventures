@@ -83,7 +83,7 @@ const DATA = {
       nombre: "Regar las Flores",
       emoji: "🌻",
       tipo: "matematicas",
-      intro: "Las flores tienen sed. ¡Cuenta cuántas hay y dale a Pelu el número correcto de gotas! 💧",
+      intro: "Las flores mágicas solo se abren con números. Resuelve 5 retos seguidos: si aciertas 4, ¡las flores crecen y subes de nivel! 💧",
     },
     {
       id: "cofre_palabras",
@@ -91,7 +91,7 @@ const DATA = {
       nombre: "El Cofre de Palabras",
       emoji: "🗝️",
       tipo: "ingles",
-      intro: "Un cofre mágico se abre si dices el nombre en inglés del objeto. ¿Lo descubres?",
+      intro: "El cofre guarda más de mil palabras y frases en inglés. Traduce, completa y deletrea: cada ronda es más difícil que la anterior. 🔐",
     },
     {
       id: "puente_patrones",
@@ -99,7 +99,7 @@ const DATA = {
       nombre: "El Puente de Patrones",
       emoji: "🌉",
       tipo: "logica",
-      intro: "Para cruzar el puente, completa la secuencia mágica. ¿Qué sigue?",
+      intro: "El puente se arma con secuencias, sudokus, cuadrados mágicos, acertijos y códigos secretos. ¿Hasta qué nivel llegas? 🧩",
     },
     {
       id: "mercado",
@@ -107,7 +107,7 @@ const DATA = {
       nombre: "El Mercadito",
       emoji: "🍎",
       tipo: "dinero",
-      intro: "Ayuda a Pelu a comprar y a contar el cambio. ¡Cuidado con las monedas!",
+      intro: "Compra con pesos de verdad: cuenta monedas, calcula el vuelto, aprovecha descuentos y descubre qué oferta conviene. 🪙",
     },
     {
       id: "conchas",
@@ -115,7 +115,7 @@ const DATA = {
       nombre: "Coleccionar Conchas",
       emoji: "🐚",
       tipo: "matematicas",
-      intro: "Suma las conchas que encuentra Pelu en la arena.",
+      intro: "Cada concha esconde un problema de números. ¡Junta 5 y llénate de estrellas! 🐚",
     },
     {
       id: "amigos",
@@ -174,6 +174,30 @@ const DATA = {
       emoji: "🧩",
       tipo: "escape",
       intro: "¡Pelu quedó encerrada en un cuarto misterioso! Toca los objetos, encuentra 3 pistas escondidas, descubre el código del candado 🔒 y ¡escapa! 🚪 Si te atascas, usa la 💡 pista.",
+    },
+    {
+      id: "clase_pociones",
+      lugar: "colegio",
+      nombre: "Clase de Pociones",
+      emoji: "⚗️",
+      tipo: "matematicas",
+      intro: "La Directora Estela necesita medidas exactas para su poción. Fracciones, porcentajes y ecuaciones: ¡un error y la poción explota en burbujas! 🫧",
+    },
+    {
+      id: "biblioteca",
+      lugar: "colegio",
+      nombre: "Biblioteca Encantada",
+      emoji: "📚",
+      tipo: "ingles",
+      intro: "Los libros de la biblioteca están escritos en inglés. Ayuda a Pelu a leerlos: gramática, frases y palabras difíciles. 🇬🇧",
+    },
+    {
+      id: "acertijos_buho",
+      lugar: "colegio",
+      nombre: "Acertijos del Profe Búho",
+      emoji: "🦉",
+      tipo: "logica",
+      intro: "Uju… El Profe Búho tiene acertijos, analogías y desafíos que hasta a él le cuestan. ¿Te atreves? 🧠",
     },
     {
       id: "cap1",

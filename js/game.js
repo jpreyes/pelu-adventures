@@ -48,6 +48,7 @@ const Estado = {
       coleccionPeces: [],                 // especies de peces atrapadas (emoji)
       historia: [],                       // capítulos de la novela completados
       historiaPagada: [],                 // capítulos cuyas estrellas ya se cobraron
+      niveles: {},                        // nivel 1–10 por materia (se adapta solo; ver retos.js)
     };
   },
 
@@ -730,10 +731,26 @@ const Juego = {
         <h1>Ajustes ⚙️</h1>
         <div class="ajuste">
           <p><b>Edad / dificultad:</b> ${e} ${e >= 11 ? "(nivel avanzado)" : "años"}</p>
-          <p class="sub">Cambia qué tan difíciles son los números y los retos. Del 11 en adelante hay álgebra, fracciones y multi-paso. El juego crece con Celeste.</p>
+          <p class="sub">Define el nivel inicial de cada materia. Cambiarla reinicia los niveles de abajo.</p>
           <div class="botones-edad">
-            ${[4,5,6,7,8,9,10,11,12].map(n =>
+            ${[4,5,6,7,8,9,10,11,12,13].map(n =>
               `<button class="btn-edad ${n===e?"activa":""}" onclick="Juego.setEdad(${n})">${n}</button>`).join("")}
+          </div>
+        </div>
+        <div class="ajuste">
+          <p><b>Nivel de cada materia</b> (1 a 10)</p>
+          <p class="sub" style="text-align:left">Sube solo con 4 o 5 respuestas correctas de 5, y baja con 2 o menos. También puedes ajustarlo aquí.</p>
+          <div class="niveles-materias">
+            ${Object.entries(Retos.MATERIAS).map(([m, nombre]) => {
+              const nv = Retos.nivel(m);
+              return `<div class="nivel-fila">
+                <span class="nombre">${nombre}</span>
+                <span class="nivel-barra"><i style="width:${nv * 10}%"></i></span>
+                <button class="btn-edad" aria-label="Bajar nivel" onclick="Retos.setNivel('${m}', ${nv - 1}); Juego.ajustes()">−</button>
+                <span class="valor">${nv}</span>
+                <button class="btn-edad" aria-label="Subir nivel" onclick="Retos.setNivel('${m}', ${nv + 1}); Juego.ajustes()">+</button>
+              </div>`;
+            }).join("")}
           </div>
         </div>
         <div class="ajuste">
@@ -750,7 +767,7 @@ const Juego = {
       </div>`;
   },
 
-  setEdad(n) { Estado.data.edad = n; Estado.guardar(); this.ajustes(); },
+  setEdad(n) { Estado.data.edad = n; Estado.data.niveles = {}; Estado.guardar(); this.ajustes(); },
 
   cambiarJugadora() { this.perfiles(); },
 

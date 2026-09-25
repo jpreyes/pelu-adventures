@@ -17,8 +17,34 @@ const PeluEscape = {
       c1: false, c2: false, c3: false,  // pistas descubiertas
       tieneLlave: false, cajonAbierto: false,
       tesoro: false, intentos: 0, ganado: false,
+      // Desde nivel 4 de lógica, las pistas no regalan la cifra: hay que razonarla
+      nivel: typeof Retos !== "undefined" ? Retos.nivel("logica") : 1,
     };
+    this.acertijos();
     this.cuarto();
+  },
+
+  // Prepara cómo se esconde cada cifra según el nivel
+  acertijos() {
+    const s = this.s, ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+    s.duro = s.nivel >= 4;
+    // 1) Cuadro: estrellas → cifra
+    if (s.nivel >= 7) { const k = ri(1, 3); s.estrellas = s.d1 * 2 + k; s.p1 = `La 1ª cifra es: (estrellas − ${k}) ÷ 2`; }
+    else if (s.duro) { s.estrellas = s.d1 * 2; s.p1 = "La 1ª cifra es la MITAD de las estrellas"; }
+    else { s.estrellas = s.d1; s.p1 = `Cuentas <b>${s.d1}</b> estrellas. La <b>1ª cifra</b> del código es <b>${s.d1}</b>.`; }
+    // 2) Reloj: hora dentro de k horas (reloj de 12 h)
+    const k2 = ri(3, 8);
+    s.hora = ((s.d2 - k2 - 1) % 12 + 12) % 12 + 1;
+    s.p2 = s.duro ? `El reloj marca las <b>${s.hora}:00</b>. La 2ª cifra es la hora que marcará dentro de <b>${k2} horas</b>.`
+                  : `El reloj marca las <b>${s.d2}</b> en punto.<br>La <b>2ª cifra</b> es <b>${s.d2}</b>.`;
+    s.hora = s.duro ? s.hora : s.d2;
+    // 3) Papelito del cajón
+    if (s.duro) {
+      const a = ri(2, 4), b = ri(Math.max(2, Math.ceil(s.d3 / a)), 5), c = a * b - s.d3;
+      const y = ri(s.d3 + 1, s.d3 + 5), x = y * ri(2, 6) + s.d3;
+      s.p3 = s.nivel >= 7 ? `"La última cifra es el RESTO de dividir ${x} entre ${y}"`
+                          : `"La última cifra es ${a} × ${b} − ${c}"`;
+    } else s.p3 = `"La última cifra es <b>${s.d3}</b>"`;
   },
 
   salir() { Juego.entrar(this.s.lugar); },
@@ -27,7 +53,8 @@ const PeluEscape = {
   cuarto() {
     const s = this.s;
     const track = c => c === false ? "•" : "?"; // placeholder no usado
-    const slot = (ok, d) => `<span class="pista-slot ${ok ? "ok" : ""}">${ok ? d : "?"}</span>`;
+    // en niveles altos la pista encontrada se marca con 🔍: la cifra hay que deducirla
+    const slot = (ok, d) => `<span class="pista-slot ${ok ? "ok" : ""}">${ok ? (s.duro ? "🔍" : d) : "?"}</span>`;
 
     const inv = [];
     if (s.tieneLlave) inv.push("🔑");
@@ -71,13 +98,13 @@ const PeluEscape = {
     const s = this.s;
     if (id === "cuadro") {
       s.c1 = true;
-      this.modal(`<h2>El Cuadro 🖼️</h2><div class="cuadro-arte">${"⭐".repeat(s.d1)}</div>
-        <p>Cuentas <b>${s.d1}</b> estrellas.<br>La <b>1ª cifra</b> del código es <b>${s.d1}</b>.</p>`);
+      this.modal(`<h2>El Cuadro 🖼️</h2><div class="cuadro-arte">${"⭐".repeat(s.estrellas)}</div>
+        <p>${s.p1}</p>`);
       this.cuarto();
     } else if (id === "reloj") {
       s.c2 = true;
-      this.modal(`<h2>El Reloj 🕐</h2><div class="reloj-arte">🕐</div>
-        <p>El reloj marca las <b>${s.d2}</b> en punto.<br>La <b>2ª cifra</b> es <b>${s.d2}</b>.</p>`);
+      this.modal(`<h2>El Reloj 🕐</h2><div class="reloj-arte">🕐 ${s.hora}:00</div>
+        <p>${s.p2}</p>`);
       this.cuarto();
     } else if (id === "maceta") {
       if (!s.tieneLlave) {
@@ -96,10 +123,10 @@ const PeluEscape = {
         s.cajonAbierto = true; s.c3 = true; s.tesoro = true;
         confeti();
         this.modal(`<h2>¡Abriste el Cajón! 🗄️🔑</h2>
-          <p>Dentro hay un papelito: <span class="nota">"La última cifra es <b>${s.d3}</b>"</span></p>
+          <p>Dentro hay un papelito: <span class="nota">${s.p3}</span></p>
           <p>Y un <b>tesoro 💎</b> escondido. ¡A la mochila!</p>`);
       } else {
-        this.modal(`<h2>El Cajón 🗄️</h2><p>Ya lo abriste. La última cifra es <b>${s.d3}</b>.</p>`);
+        this.modal(`<h2>El Cajón 🗄️</h2><p>Ya lo abriste. El papelito dice: <span class="nota">${s.p3}</span></p>`);
       }
       this.cuarto();
     } else if (id === "candado") {
@@ -162,7 +189,8 @@ const PeluEscape = {
     else if (!s.c2) msg = "El 🕐 reloj de la pared marca una hora… es una cifra.";
     else if (!s.tieneLlave) msg = "Falta una pista escondida. Revisa la 🪴 maceta a fondo.";
     else if (!s.cajonAbierto) msg = "Ya tienes la 🔑 llave. ¡Ábre el 🗄️ cajón!";
-    else if (!s.ganado) msg = `Ya tienes las 3 cifras (${s.d1}${s.d2}${s.d3}). Ponlas en el 🔒 cofre.`;
+    else if (!s.ganado) msg = s.duro ? "Ya tienes las 3 pistas 🔍. Resuelve cada una (vuelve a tocarlas para releer) y escribe el código en el 🔒 cofre."
+                              : `Ya tienes las 3 cifras (${s.d1}${s.d2}${s.d3}). Ponlas en el 🔒 cofre.`;
     else msg = "¡Toca la 🚪 puerta para escapar!";
     this.modal(`<h2>💡 Pista</h2><p>${msg}</p>`);
   },

@@ -381,6 +381,183 @@ h2 { font-size: 1.25rem; font-weight: 800; text-align: center; color: var(--rosa
 .tesoro { font-size: 1.2rem; color: var(--morado-osc); font-weight: 800; }
 .botones-final { display: flex; justify-content: center; flex-wrap: wrap; }
 
+/* ---------- Rondas de retos (5 preguntas, nivel adaptable) ---------- */
+.reto-ronda { --materia: var(--morado); --materia-claro: var(--morado-claro); }
+.reto-ronda > * { max-width: 780px; margin-left: auto; margin-right: auto; }
+.ronda-top {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-bottom: 6px;
+}
+.ronda-top .volver { justify-self: start; }
+.ronda-chips { justify-self: end; display: flex; gap: 6px; align-items: center; }
+@media (max-width: 560px) {
+  .ronda-top { grid-template-columns: auto 1fr; }
+  .ronda-puntos { grid-column: 1 / -1; grid-row: 2; }
+}
+.ronda-puntos { display: flex; gap: 8px; justify-content: center; }
+.punto {
+  width: 16px; height: 16px; border-radius: 50%; background: #efe8f4;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .06); transition: background .3s, transform .3s;
+}
+.punto.ok { background: var(--verde); box-shadow: inset 0 -2px 0 var(--verde-osc); }
+.punto.no { background: var(--rojo); box-shadow: inset 0 -2px 0 var(--rojo-osc); }
+.punto.actual { background: #fff; box-shadow: 0 0 0 3px var(--morado), 0 0 0 7px var(--morado-claro); transform: scale(1.1); }
+.nivel-chip {
+  font-weight: 800; font-size: .92rem; padding: 6px 14px; border-radius: 999px; white-space: nowrap;
+  background: var(--morado-claro); color: var(--morado-osc); font-variant-numeric: tabular-nums;
+}
+.nivel-chip.materia-matematicas { background: var(--rosa-claro); color: #c93f78; }
+.nivel-chip.materia-ingles { background: var(--azul-claro); color: #1f78bf; }
+.nivel-chip.materia-dinero { background: var(--amarillo-claro); color: #a8740a; }
+.nivel-chip.grande { display: inline-block; font-size: 1.05rem; padding: 8px 18px; margin: 4px 0 10px; }
+.racha-chip {
+  font-weight: 800; font-size: .92rem; padding: 6px 12px; border-radius: 999px; color: #fff;
+  background: linear-gradient(135deg, #ff9a3c, #ff5f6d); box-shadow: 0 2px 0 #d8454f; animation: brinco .5s;
+}
+.ronda-titulo { text-align: center; font-weight: 800; color: var(--texto-suave); font-size: 1rem; margin: 10px auto 4px; }
+/* cada materia tiñe el cuadro del reto con su color */
+.reto-ronda .reto-escena { min-height: 150px; padding: 22px 18px; border-radius: 26px; }
+.reto-ronda.materia-matematicas .reto-escena { background: linear-gradient(160deg, #fff5fa, #ffe6f1); box-shadow: inset 0 0 0 2px #ffd3e6; }
+.reto-ronda.materia-logica      .reto-escena { background: linear-gradient(160deg, #f8f4ff, #ece3ff); box-shadow: inset 0 0 0 2px #ddd0fb; }
+.reto-ronda.materia-ingles      .reto-escena { background: linear-gradient(160deg, #f4faff, #e1f0ff); box-shadow: inset 0 0 0 2px #c8e3fb; }
+.reto-ronda.materia-dinero      .reto-escena { background: linear-gradient(160deg, #fffbf1, #fff0c9); box-shadow: inset 0 0 0 2px #fbe19c; }
+.reto-ronda .opcion-reto { font-size: 1.5rem; min-width: 110px; min-height: 68px; }
+.reto-ronda .reto-pregunta { font-size: 1.4rem; margin: 18px auto 6px; }
+/* portada de la aventura: Pelu arriba del botón */
+.av-intro { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.ronda-titulo span { font-weight: 700; opacity: .8; font-variant-numeric: tabular-nums; }
+.reto-ronda .reto-escena { flex-direction: column; animation: aparecer .3s cubic-bezier(.2, .8, .3, 1); }
+
+.problema { font-size: 1.25rem; line-height: 1.55; margin: 0; max-width: 40ch; text-wrap: pretty; }
+.problema.acertijo { font-size: 1.3rem; font-weight: 700; }
+.problema.analogia { font-size: 1.45rem; line-height: 1.7; }
+.blanco { display: inline-block; min-width: 3.2em; border-bottom: 4px solid var(--morado); color: transparent; }
+.ingles-frase .blanco { color: transparent; }
+.tema-chip {
+  display: inline-block; vertical-align: middle; font-size: .78rem; font-weight: 800; letter-spacing: .02em;
+  padding: 3px 10px; border-radius: 999px; background: var(--azul-claro); color: #1f78bf; margin-left: 4px;
+}
+.chip-palabra {
+  display: inline-block; margin: 5px; padding: 10px 18px; border-radius: 16px; font-weight: 800; font-size: 1.15rem;
+  background: #fff; box-shadow: 0 3px 0 var(--borde), inset 0 0 0 2px var(--borde);
+}
+.cifrado { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .3em; color: var(--morado-osc); font-size: 1.5rem; }
+
+/* secuencias como fichas */
+.secuencia { gap: 10px; }
+.secuencia span {
+  min-width: 58px; padding: 8px 12px; border-radius: 16px; background: #fff; font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800;
+  box-shadow: 0 3px 0 var(--borde), inset 0 0 0 2px var(--borde); font-variant-numeric: tabular-nums;
+}
+.secuencia .hueco { background: var(--morado-claro); color: var(--morado-osc); box-shadow: inset 0 0 0 3px var(--morado); }
+
+/* grillas: sudoku 4×4 y cuadrado mágico 3×3 */
+.grilla { display: grid; gap: 0; border: 4px solid var(--texto); border-radius: 14px; overflow: hidden; background: #fff; }
+.grilla.g3 { grid-template-columns: repeat(3, 64px); }
+.grilla.g4 { grid-template-columns: repeat(4, 58px); }
+.grilla span {
+  height: 58px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800;
+  border-right: 1px solid #e5dcec; border-bottom: 1px solid #e5dcec; font-variant-numeric: tabular-nums;
+}
+.grilla.g3 span { height: 64px; }
+.grilla span.borde-d { border-right: 3px solid var(--texto); }
+.grilla span.borde-b { border-bottom: 3px solid var(--texto); }
+.grilla span.hueco { background: var(--morado-claro); color: var(--morado-osc); animation: pulso 1.4s ease-in-out infinite; }
+
+/* figuras */
+.figura-rect {
+  position: relative; width: min(260px, 60vw); aspect-ratio: var(--w) / var(--h); max-height: 180px; margin: 10px 60px 34px 10px;
+  background: repeating-linear-gradient(45deg, #dff5e6 0 10px, #cdeed8 10px 20px);
+  border: 4px solid var(--verde-osc); border-radius: 6px;
+}
+.figura-rect span { position: absolute; font-size: 1rem; font-weight: 800; color: var(--texto); white-space: nowrap; }
+.figura-rect span:first-child { left: 50%; bottom: -30px; transform: translateX(-50%); }
+.figura-rect span:last-child { right: -10px; top: 50%; transform: translate(100%, -50%); }
+.figura-tri { position: relative; width: 220px; height: 150px; margin: 8px 70px 30px; }
+.figura-tri::before {                    /* el triángulo va en ::before para que las etiquetas no se recorten */
+  content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, #ffc2dd, #d9ccfb);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.figura-tri span { position: absolute; font-size: .95rem; font-weight: 800; color: var(--texto); white-space: nowrap; }
+.figura-tri span:nth-child(1) { left: 50%; bottom: -28px; transform: translateX(-50%); }
+.figura-tri span:nth-child(2) { right: -8px; top: 42%; transform: translateX(100%); }
+.figura-tri span:nth-child(3) { left: 50%; top: 18px; transform: translateX(-50%); }
+
+/* dinero chileno */
+.monedas-fila { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.moneda {
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; font-size: .95rem;
+  color: #5a4210; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .15), inset 0 0 0 3px rgba(255, 255, 255, .45), 0 3px 6px rgba(0, 0, 0, .12);
+}
+.moneda.m10  { width: 50px; height: 50px; background: radial-gradient(circle at 35% 30%, #f0c08a, #c98a4b); }
+.moneda.m50  { width: 56px; height: 56px; background: radial-gradient(circle at 35% 30%, #f4f4f4, #b9b9b9); color: #4a4a4a; }
+.moneda.m100 { width: 60px; height: 60px; background: radial-gradient(circle, #f3d27a 0 48%, #cfcfcf 50%, #a9a9a9 100%); }
+.moneda.m500 { width: 66px; height: 66px; background: radial-gradient(circle at 35% 30%, #fbe39a, #d6a72a); }
+.lista-compra {
+  display: grid; gap: 6px; min-width: min(320px, 100%); padding: 14px 18px; background: #fff; border-radius: 14px;
+  box-shadow: var(--sombra-baja); border-top: 3px dashed var(--borde); border-bottom: 3px dashed var(--borde);
+  font-size: 1.1rem; text-align: left;
+}
+.lista-compra div { display: flex; justify-content: space-between; gap: 16px; }
+.balanzas { display: grid; gap: 8px; }
+.balanzas div {
+  font-size: 1.7rem; font-weight: 800; padding: 8px 20px; border-radius: 16px; background: #fff;
+  box-shadow: 0 3px 0 var(--borde), inset 0 0 0 2px var(--borde); font-variant-numeric: tabular-nums;
+}
+
+/* opciones largas (frases, acertijos): tarjetas blancas legibles */
+.reto-opciones.largas { display: grid; grid-template-columns: 1fr; gap: 10px; max-width: 700px; }
+@media (min-width: 820px) { .reto-opciones.largas { grid-template-columns: 1fr 1fr; } }
+.reto-opciones.largas .opcion-reto {
+  font-size: 1.08rem; font-weight: 700; text-align: left; line-height: 1.35; padding: 14px 18px;
+  background: #fff; color: var(--texto); box-shadow: 0 4px 0 var(--borde), inset 0 0 0 2px var(--borde);
+}
+.reto-opciones.largas .opcion-reto.correcta { background: var(--verde); color: #fff; box-shadow: 0 4px 0 var(--verde-osc); }
+.reto-opciones.largas .opcion-reto.incorrecta { background: var(--rojo); color: #fff; box-shadow: 0 4px 0 var(--rojo-osc); }
+.opcion-reto:disabled { cursor: default; }
+.opcion-reto:disabled:not(.correcta):not(.incorrecta) { opacity: .45; }
+
+/* explicación después de responder */
+.explicacion {
+  margin: 18px auto 0; max-width: 700px; text-align: left; padding: 16px 20px; border-radius: 22px;
+  display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start;
+  animation: aparecer .3s cubic-bezier(.2, .8, .3, 1);
+}
+.exp-pelu { animation: brincaPelu .6s ease; }
+.exp-texto { display: grid; gap: 8px; }
+@media (max-width: 480px) { .explicacion { grid-template-columns: 1fr; } .exp-pelu { display: none; } }
+.explicacion.bien { background: var(--verde-claro); box-shadow: inset 0 0 0 2px #b6ecd0; }
+.explicacion.mal { background: #fff0f2; box-shadow: inset 0 0 0 2px #ffd0d7; }
+.exp-texto > b { font-size: 1.2rem; }
+.explicacion p { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+.explicacion .resp { display: inline-block; padding: 1px 12px; border-radius: 999px; background: var(--verde); color: #fff; }
+.explicacion .btn { justify-self: end; margin: 4px 0 0; }
+.btn-oir {
+  justify-self: start; font-family: inherit; font-weight: 800; font-size: .95rem; border: none; cursor: pointer;
+  min-height: 44px; padding: 8px 16px; border-radius: 999px; background: var(--azul-claro); color: #1f78bf; box-shadow: 0 3px 0 #c3e2fb;
+}
+.btn-oir:active { transform: translateY(3px); box-shadow: none; }
+
+/* resultado de la ronda */
+.resultado-ronda { display: grid; gap: 6px; justify-items: center; margin: 6px 0 4px; }
+.resultado-ronda p { margin: 0; font-size: 1.1rem; }
+.estrellas-fila { display: flex; gap: 6px; font-size: 2.4rem; line-height: 1; }
+.estrellas-fila span { color: #e8e0ee; }
+.estrellas-fila span.si { color: var(--amarillo); text-shadow: 0 3px 0 var(--amarillo-osc); animation: brinco .45s both; }
+.estrellas-fila span:nth-child(2) { animation-delay: .1s; } .estrellas-fila span:nth-child(3) { animation-delay: .2s; }
+.estrellas-fila span:nth-child(4) { animation-delay: .3s; } .estrellas-fila span:nth-child(5) { animation-delay: .4s; }
+.nivel-cambio { padding: 8px 18px; border-radius: 999px; font-weight: 700; font-size: 1.05rem; }
+.nivel-cambio.sube { background: var(--verde-claro); color: var(--verde-osc); }
+.nivel-cambio.baja { background: var(--amarillo-claro); color: #a8740a; }
+.nivel-cambio.igual { background: var(--morado-claro); color: var(--morado-osc); }
+
+/* niveles por materia en Ajustes */
+.niveles-materias { display: grid; gap: 8px; margin-top: 8px; }
+.nivel-fila { display: flex; align-items: center; gap: 10px; }
+.nivel-fila .nombre { flex: 1; font-weight: 800; }
+.nivel-fila .valor { min-width: 2.2em; text-align: center; font-weight: 800; font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.nivel-barra { flex: 2; height: 10px; border-radius: 999px; background: #efe8f4; overflow: hidden; }
+.nivel-barra i { display: block; height: 100%; background: linear-gradient(90deg, var(--rosa), var(--morado)); border-radius: 999px; }
+
 /* ---------- Ajustes ---------- */
 .ajuste { background: #fbf8fd; border: 1px solid var(--borde); border-radius: 20px; padding: 16px 18px; margin: 12px 0; }
 .ajuste p { margin: .4em 0; }
