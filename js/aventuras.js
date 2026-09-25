@@ -21,7 +21,7 @@ const Aventura = {
       <div class="escena aventura-escena">
         <button class="volver" onclick="Juego.entrar('${a.lugar}')">← Volver</button>
         <div class="av-intro">
-          <div class="av-emoji-grande">${a.emoji}</div>
+          ${(d => `<div class="av-emoji-grande ${d ? "dibujo" : ""} ${d && d.oscuro ? "oscuro" : ""}">${d ? d.svg : a.emoji}</div>`)(Arte.aventura(a))}
           <h1>${a.nombre}</h1>
           ${Retos.MATERIAS[a.tipo] ? `<div class="nivel-chip grande materia-${a.tipo}">Nivel ${Retos.nivel(a.tipo)} de 10 · ${this.PREGUNTAS_RONDA} preguntas</div>` : ""}
           <p class="av-texto">${a.intro}</p>
@@ -202,6 +202,10 @@ const Aventura = {
     else if (r.aciertos <= 2) nuevo = antes - 1;
     Retos.setNivel(r.materia, nuevo);
     nuevo = Retos.nivel(r.materia);
+    if (window.Misiones) {
+      Misiones.registrar("jugada_" + r.materia);
+      if (r.aciertos >= 4) Misiones.registrar("ronda_" + r.materia);
+    }
     // Estrellas: más por nivel alto; bonus por ronda perfecta
     const porAcierto = 1 + Math.floor(antes / 3);
     const estrellas = r.aciertos * porAcierto + (r.aciertos === n ? 5 : 0);

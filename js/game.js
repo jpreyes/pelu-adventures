@@ -41,7 +41,8 @@ const Estado = {
         lugares: DATA.lugares.filter(x => x.desbloqueado).map(x => x.id),
       },
       vestido: { sombrero: "gorro_estrella", collar: "lazo_rosa", gafas: null, mochila: null },
-      habitacion: ["cama", "alfombra"],   // muebles colocados en la casa
+      habitacion: [],                     // muebles comprados puestos en la casa (la casa ya viene amueblada)
+      casaV2: true,                       // save creado con la casa de muñecas nueva
       posiciones: {},                     // key -> {x,y} en % dentro de la casa (arrastre libre)
       aventurasHechas: {},                // id -> veces completada
       coleccion: [],                      // tesoros secretos encontrados
@@ -61,6 +62,7 @@ const Estado = {
     }
     // Saves anteriores a "historiaPagada": lo ya leído ya se cobró
     if (!Array.isArray(this.data.historiaPagada)) this.data.historiaPagada = (this.data.historia || []).slice();
+    const casaVieja = !this.data.casaV2;        // se mira ANTES de rellenar campos nuevos
     // Asegura campos nuevos si el save es viejo
     const base = this.nuevo();
     for (const k in base) if (!(k in this.data)) this.data[k] = base[k];
@@ -72,6 +74,13 @@ const Estado = {
       this.data.poseidos[c] = this.data.poseidos[c].filter(id => existe(DATA[c], id));
     });
     this.data.habitacion = this.data.habitacion.filter(id => existe(DATA.muebles, id));
+    // Casa de muñecas (v2): ya viene amueblada, así que la cama y alfombra iniciales sobran,
+    // y las posiciones de la casa anterior (otro diseño) se reinician una sola vez.
+    if (casaVieja) {
+      this.data.habitacion = this.data.habitacion.filter(id => id !== "cama" && id !== "alfombra");
+      Object.keys(this.data.posiciones).forEach(k => delete this.data.posiciones[k]);
+      this.data.casaV2 = true;
+    }
     // Abre cualquier lugar marcado como desbloqueado (para saves viejos)
     DATA.lugares.forEach(l => {
       if (l.desbloqueado && !this.data.poseidos.lugares.includes(l.id)) this.data.poseidos.lugares.push(l.id);
@@ -161,27 +170,19 @@ function toast(msg) {
 function barra() {
   return `
     <div class="barra">
-      <button class="btn-redondo" onclick="Juego.inicio()">🏠</button>
-      <div class="monedas">⭐ <span>${Estado.data.estrellas}</span></div>
-      <button class="btn-redondo" onclick="Juego.ajustes()">⚙️</button>
+      <button class="btn-redondo" onclick="Juego.inicio()" aria-label="Ir al pueblo">${Arte.icono("casa", "#6a45d4", 24)}</button>
+      <div class="monedas">${Arte.estrella(24)}<span>${Estado.data.estrellas}</span></div>
+      <div class="barra-der">
+        <button class="btn-redondo" onclick="Juego.album()" aria-label="Álbum">${Arte.icono("album", "#6a45d4", 24)}</button>
+        <button class="btn-redondo" onclick="Juego.ajustes()" aria-label="Ajustes">${Arte.icono("ajustes", "#6a45d4", 24)}</button>
+      </div>
     </div>`;
 }
 
-/* ---------- Dibujo de Pelu vestida (gatita blanca SVG + accesorios) ---------- */
+/* ---------- Pelu vestida: gatita SVG con sus accesorios dibujados (arte.js) ---------- */
 function dibujarPelu(tam = 120, expresion = "feliz") {
-  const v = Estado.data.vestido;
-  const e = id => { const r = buscar(DATA.ropa, id); return r ? r.emoji : ""; };
-  const acc = (emoji, cls, frac, top, left = 50) => emoji
-    ? `<span class="acc ${cls}" style="font-size:${tam * frac}px;top:${tam * top}px;left:${left}%">${emoji}</span>`
-    : "";
-  return `
-    <div class="pelu" style="width:${tam}px;height:${tam * 1.12}px">
-      ${acc(e(v.mochila), "a-mochila", 0.34, 0.45, 16)}
-      <div class="pelu-svg" style="width:${tam}px">${PeluSprite.svg(expresion)}</div>
-      ${acc(e(v.sombrero), "a-sombrero", 0.46, -0.06, 50)}
-      ${acc(e(v.gafas),    "a-gafas",    0.36,  0.30, 50)}
-      ${acc(e(v.collar),   "a-collar",   0.36,  0.78, 50)}
-    </div>`;
+  const acc = Object.values(Estado.data.vestido).filter(Boolean);
+  return `<div class="pelu" style="width:${tam}px">${Arte.gata("pelu", { expresion, accesorios: acc })}</div>`;
 }
 
 /* ============================================================
@@ -210,52 +211,40 @@ const Juego = {
     Estado.guardar();
   },
 
-  /* ---------- INICIO: dos láminas (Historia / Minijuegos) ---------- */
+  /* ---------- INICIO: el Pueblo ilustrado (pueblo.js) ---------- */
+  origen: "pueblo",          // desde dónde se entró a un lugar: "pueblo" o "mapa" (Minijuegos)
   inicio() {
     this.limpiarPendientes();                 // salida deliberada al hub
-    app().innerHTML = `
-      ${barra()}
-      <div class="escena inicio-escena">
-        <div class="saludo">
-          ${dibujarPelu(96)}
-          <h1>Pelu Adventures</h1>
-          <p class="sub">¿Qué hacemos hoy, ${esc(Perfil.actual() || "exploradora")}? 🐾</p>
-        </div>
-        <div class="laminas">
-          <div class="lamina lam-historia" onclick="Mundo.start()">
-            <div class="lamina-emoji">📖</div>
-            <h2>Historia</h2>
-            <p>Camina por el valle de Pelu, habla con tus amigas y vive aventuras. 🗺️</p>
-          </div>
-          <div class="lamina lam-juegos" onclick="Juego.mapa()">
-            <div class="lamina-emoji">🎮</div>
-            <h2>Minijuegos</h2>
-            <p>Entra directo a un reto: pesca, cocina, carrera, lógica y más. ✨</p>
-          </div>
-        </div>
-      </div>`;
+    this.origen = "pueblo";
+    Pueblo.render();
   },
+
+  abrirMinijuegos() { this.origen = "mapa"; this.mapa(); },
+
+  // Botón "Volver" de los lugares, la casa, el vestidor, ajustes…
+  volver() { return this.origen === "mapa" ? this.mapa() : this.inicio(); },
 
   /* ---------- PERFILES (varias jugadoras) ---------- */
   perfiles() {
     this.limpiarPendientes();
     const l = Perfil.lista();
     // El nombre va en data-n (escapado): así un apóstrofe no rompe el onclick
-    const cards = l.map(n => `
+    const colores = ["pelu", "luna", "mia", "nina"];
+    const cards = l.map((n, i) => `
       <div class="perfil-card" data-n="${esc(n)}" onclick="Juego.entrarPerfil(this.dataset.n)">
-        <div class="perfil-avatar">🐱</div>
+        <div class="perfil-avatar">${Arte.cara(colores[i % 4], 64)}</div>
         <div class="perfil-nombre">${esc(n)}</div>
         <button class="perfil-x" aria-label="Borrar" onclick="event.stopPropagation();Juego.borrarPerfil(this.parentNode.dataset.n)">✕</button>
       </div>`).join("");
     app().innerHTML = `
       <div class="escena perfiles-escena">
-        <div class="saludo"><div class="pelu-svg" style="width:90px;margin:0 auto">${PeluSprite.svg()}</div>
+        <div class="saludo"><div class="pelu" style="width:120px">${Arte.gata("pelu", { accesorios: ["gorro_estrella", "lazo_rosa"] })}</div>
           <h1>Pelu Adventures</h1>
-          <p class="sub">¿Quién va a jugar hoy? 💖</p>
+          <p class="sub">¿Quién va a jugar hoy?</p>
         </div>
         <div class="grid-perfiles">${cards}
           <div class="perfil-card nuevo" onclick="Juego.nuevoPerfil()">
-            <div class="perfil-avatar">➕</div>
+            <div class="perfil-avatar">${Arte.icono("mas", "#8a63f0", 44, 2.6)}</div>
             <div class="perfil-nombre">Nueva jugadora</div>
           </div>
         </div>
@@ -265,8 +254,8 @@ const Juego = {
   nuevoPerfil() {
     app().innerHTML = `
       <div class="escena perfiles-escena">
-        <h1>¿Cómo te llamas? ✨</h1>
-        <div class="pelu-svg" style="width:90px;margin:10px auto">${PeluSprite.svg("feliz")}</div>
+        <h1>¿Cómo te llamas?</h1>
+        <div class="pelu" style="width:110px;margin:10px auto">${Arte.gata("pelu", { expresion: "guino" })}</div>
         <input id="nombre-input" class="nombre-input" maxlength="14" placeholder="Tu nombre" autocomplete="off" />
         <div class="botones-final">
           <button class="btn grande" onclick="Juego.crearPerfil()">¡Empezar! 🌟</button>
@@ -293,8 +282,10 @@ const Juego = {
     if (confirm(`¿Borrar a ${n} y su progreso?`)) { Perfil.borrar(n); this.perfiles(); }
   },
 
-  /* ---------- MAPA DEL MUNDO (tarjetas) ---------- */
-  mapa() {
+  /* ---------- MINIJUEGOS (tarjetas de lugares) ----------
+     explicito = la niña lo abrió (dock / Volver). Si no, venimos de terminar
+     un juego y volvemos al lugar donde estaba. */
+  mapa(explicito = false) {
     // por si venimos de un juego Phaser, aseguramos ver el menu HTML
     const ph = document.getElementById("juego-phaser");
     if (ph) { ph.style.display = "none"; ph.innerHTML = ""; }
@@ -309,25 +300,27 @@ const Juego = {
       const p = Mundo.pendiente; Mundo.pendiente = null;
       return Mundo.reanudar(p);
     }
+    if (!explicito && this.ultimoLugar) return this.lugar(this.ultimoLugar);
+    this.origen = "mapa"; this.ultimoLugar = null;
 
     const lugares = DATA.lugares.map(l => {
       const abierto = Estado.tiene("lugares", l.id);
       return `
         <div class="lugar ${abierto ? "" : "cerrado"}" style="background:${l.color}"
              onclick="Juego.${abierto ? `entrar('${l.id}')` : `desbloquearLugar('${l.id}')`}">
-          <div class="lugar-emoji">${l.emoji}</div>
+          <div class="lugar-emoji">${Arte.lugar(l.id) || l.emoji}</div>
           <div class="lugar-nombre">${l.nombre}</div>
-          ${abierto ? "" : `<div class="candado">🔒 ${l.precio}⭐</div>`}
+          ${abierto ? "" : `<div class="candado">${Arte.icono("candado", "#7d6887", 16)} ${l.precio}</div>`}
         </div>`;
     }).join("");
 
     app().innerHTML = `
       ${barra()}
       <div class="escena">
+        <button class="volver" onclick="Juego.inicio()">← Pueblo</button>
         <div class="saludo">
-          ${dibujarPelu(90)}
-          <h1>El Mundo de Pelu</h1>
-          <p class="sub">¿A dónde vamos hoy, exploradora? 🧭</p>
+          <h1>Minijuegos</h1>
+          <p class="sub">Elige un lugar y entra directo a sus retos.</p>
         </div>
         <div class="grid-lugares">${lugares}</div>
       </div>`;
@@ -344,7 +337,7 @@ const Juego = {
     Estado.guardar();
     confeti();
     toast(`¡Descubriste ${l.nombre}! 🎉`);
-    this.mapa();
+    this.mapa(true);
   },
 
   /* ---------- ENTRAR A UN LUGAR ---------- */
@@ -366,6 +359,7 @@ const Juego = {
   // Lugar genérico con sus aventuras
   lugar(id) {
     const l = buscar(DATA.lugares, id);
+    this.ultimoLugar = id;
     const avs = DATA.aventuras.filter(a => a.lugar === id);
     const tarjetas = avs.map(a => {
       const hechas = Estado.data.aventurasHechas[a.id] || 0;
@@ -375,7 +369,7 @@ const Juego = {
         const req = buscar(DATA.aventuras, a.requiere);
         return `
           <div class="aventura bloqueada" onclick="Juego.avBloqueada('${req ? req.nombre : ""}')">
-            <div class="aventura-emoji">🔒</div>
+            <div class="aventura-emoji">${Arte.icono("candado", "#9a8aa6", 30)}</div>
             <div>
               <div class="aventura-nombre">${a.nombre}</div>
               <div class="aventura-tag tag-${a.tipo}">Termina ${req ? req.nombre : "lo anterior"} primero</div>
@@ -384,7 +378,7 @@ const Juego = {
       }
       return `
         <div class="aventura" onclick="Aventura.empezar('${a.id}')">
-          <div class="aventura-emoji">${a.emoji}</div>
+          ${(d => `<div class="aventura-emoji ${d && d.oscuro ? "oscuro" : ""}">${d ? d.svg : a.emoji}</div>`)(Arte.aventura(a))}
           <div>
             <div class="aventura-nombre">${a.nombre}</div>
             <div class="aventura-tag tag-${a.tipo}">${a.etiqueta || this.nombreTipo(a.tipo)}</div>
@@ -396,14 +390,14 @@ const Juego = {
     app().innerHTML = `
       ${barra()}
       <div class="escena" style="background:${l.color}">
-        <button class="volver" onclick="Juego.mapa()">← Mapa</button>
+        <button class="volver" onclick="Juego.ultimoLugar=null;Juego.volver()">← Volver</button>
         <div class="lugar-cabecera">
-          <span class="lugar-emoji-grande">${l.emoji}</span>
+          <span class="lugar-emoji-grande">${Arte.lugar(l.id, { ancho: 88 }) || l.emoji}</span>
           <h1>${l.nombre}</h1>
         </div>
         ${id === "tienda" ? `
           <div class="acciones-casa">
-            <button class="btn grande" onclick="Juego.tienda('ropa')">🛍️ Comprar ropa, muebles y mascotas</button>
+            <button class="btn grande" onclick="Juego.origenTienda='lugar';Juego.tienda('ropa')">${Arte.icono("tienda", "#fff", 22)} Comprar ropa, muebles y mascotas</button>
           </div>` : ""}
         <h2>Aventuras</h2>
         <div class="lista-aventuras">${tarjetas}</div>
@@ -437,61 +431,7 @@ const Juego = {
     })[t] || t;
   },
 
-  /* ---------- CASA: 3 habitaciones, objetos arrastrables ---------- */
-  casa() {
-    const P = Estado.data.posiciones;
-    // objeto arrastrable: pos guardada o default
-    const obj = (tipo, id, contenido, defX, defY, extra = "") => {
-      const key = tipo + ":" + id;
-      const p = P[key] || { x: defX, y: defY };
-      return `<div class="obj-casa ${extra}" data-key="${key}" data-tipo="${tipo}" data-id="${id}"
-                style="left:${p.x}%;top:${p.y}%">${contenido}</div>`;
-    };
-
-    const muebles = Estado.data.habitacion.map((id, i) => {
-      const m = buscar(DATA.muebles, id);
-      const dx = 10 + (i % 3) * 30 + (i % 2) * 6, dy = 40 + (Math.floor(i / 3) % 3) * 16;
-      return obj("mueble", id, `<span class="emo-mueble">${m.emoji}</span>`, dx, dy);
-    }).join("");
-
-    const mascotas = Estado.data.poseidos.mascotas.map((id, i) => {
-      const m = buscar(DATA.mascotas, id);
-      return obj("mascota", id, `<span class="emo-mascota">${m.emoji}</span>`, 16 + i * 16, 82, "mascota-anim");
-    }).join("");
-
-    const pk = Estado.data.posiciones["pelu:pelu"] || { x: 50, y: 55 };
-
-    app().innerHTML = `
-      ${barra()}
-      <div class="escena casa">
-        <button class="volver" onclick="Juego.mapa()">← Mapa</button>
-        <h1>Casa de Pelu 🏠</h1>
-
-        <div class="casa-tablero" id="casa-tablero">
-          <div class="cuarto-bg r1"><span class="cuarto-nombre">Dormitorio</span></div>
-          <div class="cuarto-bg r2"><span class="cuarto-nombre">Living</span></div>
-          <div class="cuarto-bg r3"><span class="cuarto-nombre">Jardín</span></div>
-          <div class="burbuja" id="burbuja-pelu"></div>
-          ${muebles}
-          ${mascotas}
-          <div class="obj-casa pelu-obj" id="pelu-casa" data-key="pelu:pelu" data-tipo="pelu" data-id="pelu"
-               style="left:${pk.x}%;top:${pk.y}%">${dibujarPelu(64)}</div>
-        </div>
-
-        <p class="sub casa-pista">Arrastra a Pelu, sus mascotas y los muebles para ordenar la casa. Tócalos para que reaccionen 🐾</p>
-        <div class="acciones-casa mimos">
-          <button class="btn" onclick="Juego.mimo('acariciar')">🤍 Acariciar</button>
-          <button class="btn" onclick="Juego.mimo('premio')">🍪 Premio</button>
-          <button class="btn" onclick="Juego.mimo('jugar')">🧶 Jugar</button>
-        </div>
-        <div class="acciones-casa">
-          <button class="btn grande" onclick="Juego.closet()">👗 Vestir a Pelu</button>
-          <button class="btn grande" onclick="Juego.decorar()">🛋️ Decorar</button>
-        </div>
-      </div>`;
-
-    this._initArrastreCasa();
-  },
+  /* ---------- CASA y VESTIDOR: ver casa.js (aquí quedan los ayudantes de arrastre y reacciones) ---------- */
 
   /* ---------- Arrastrar / ordenar los objetos de la casa ---------- */
   _initArrastreCasa() {
@@ -615,79 +555,12 @@ const Juego = {
     this._exprTO = setTimeout(() => this._peluExpr("feliz"), 1600);
   },
 
-  /* ---------- CLÓSET: vestir a Pelu ---------- */
-  closet() {
-    const slots = ["sombrero", "gafas", "collar", "mochila"];
-    const seccion = slots.map(slot => {
-      const items = DATA.ropa.filter(r => r.slot === slot && Estado.tiene("ropa", r.id));
-      const ninguno = `<div class="opcion-ropa ${!Estado.data.vestido[slot] ? "activa" : ""}"
-                        onclick="Juego.ponerRopa('${slot}', null)">🚫</div>`;
-      const ops = items.map(r => `
-        <div class="opcion-ropa ${Estado.data.vestido[slot] === r.id ? "activa" : ""}"
-             onclick="Juego.ponerRopa('${slot}','${r.id}')" title="${r.nombre}">${r.emoji}</div>`).join("");
-      return `<div class="fila-slot"><div class="slot-nombre">${this.iconoSlot(slot)}</div>
-              <div class="opciones-ropa">${ninguno}${ops}</div></div>`;
-    }).join("");
-
-    app().innerHTML = `
-      ${barra()}
-      <div class="escena">
-        <button class="volver" onclick="Juego.casa()">← Casa</button>
-        <h1>Vestidor de Pelu 👗</h1>
-        <div class="preview-pelu">${dibujarPelu(150)}</div>
-        ${seccion}
-        <button class="btn" onclick="Juego.tienda('ropa')">🛍️ Comprar más ropa</button>
-      </div>`;
-  },
-
-  iconoSlot(s) {
-    return ({ sombrero: "🎩 Cabeza", gafas: "🕶️ Cara", collar: "🎀 Cuello", mochila: "🎒 Espalda" })[s];
-  },
-
-  ponerRopa(slot, id) {
-    Estado.data.vestido[slot] = id;
-    Estado.guardar();
-    this.closet();
-  },
-
-  /* ---------- DECORAR: poner/quitar muebles ---------- */
-  decorar() {
-    const propios = DATA.muebles.filter(m => Estado.tiene("muebles", m.id));
-    const items = propios.map(m => {
-      const puesto = Estado.data.habitacion.includes(m.id);
-      return `<div class="opcion-mueble ${puesto ? "activa" : ""}"
-               onclick="Juego.toggleMueble('${m.id}')" title="${m.nombre}">
-               ${m.emoji}<span class="check">${puesto ? "✓" : "+"}</span></div>`;
-    }).join("");
-
-    app().innerHTML = `
-      ${barra()}
-      <div class="escena">
-        <button class="volver" onclick="Juego.casa()">← Casa</button>
-        <h1>Decorar la Casa 🛋️</h1>
-        <p class="sub">Toca un mueble para ponerlo o quitarlo.</p>
-        <div class="habitacion mini">
-          <div class="muebles">${Estado.data.habitacion.map(id => buscar(DATA.muebles, id).emoji).join("")}</div>
-          <div class="pelu-en-casa">${dibujarPelu(70)}</div>
-        </div>
-        <div class="grid-muebles">${items}</div>
-        <button class="btn" onclick="Juego.tienda('muebles')">🛍️ Comprar más muebles</button>
-      </div>`;
-  },
-
-  toggleMueble(id) {
-    const h = Estado.data.habitacion;
-    const i = h.indexOf(id);
-    if (i >= 0) h.splice(i, 1); else h.push(id);
-    Estado.guardar();
-    this.decorar();
-  },
-
   /* ---------- TIENDA ---------- */
   tienda(cat) {
-    const cats = [["ropa", "👗 Ropa"], ["muebles", "🛋️ Muebles"], ["mascotas", "🐾 Mascotas"]];
-    const tabs = cats.map(([c, n]) =>
-      `<button class="tab ${c === cat ? "activa" : ""}" onclick="Juego.tienda('${c}')">${n}</button>`).join("");
+    const cats = [["ropa", "Ropa", "ropa"], ["muebles", "Muebles", "mueble"], ["mascotas", "Mascotas", "pata"]];
+    const tabs = cats.map(([c, n, ico]) =>
+      `<button class="tab ${c === cat ? "activa" : ""}" onclick="Juego.tienda('${c}')">${Arte.icono(ico, "currentColor", 18)} ${n}</button>`).join("");
+    const dibujo = item => (cat === "ropa" ? Arte.prenda(item.id, 88) : cat === "muebles" ? Arte.mueble(item.id, { alto: 70 }) : Arte.mascota(item.id, { alto: 70 })) || item.emoji;
 
     const fuente = { ropa: DATA.ropa, muebles: DATA.muebles, mascotas: DATA.mascotas }[cat];
     const items = fuente.map(item => {
@@ -695,22 +568,30 @@ const Juego = {
       const puede = Estado.data.estrellas >= item.precio;
       return `
         <div class="producto ${tiene ? "comprado" : ""}">
-          <div class="producto-emoji">${item.emoji}</div>
+          <div class="producto-emoji">${dibujo(item)}</div>
           <div class="producto-nombre">${item.nombre}</div>
           ${tiene
-            ? `<div class="etiqueta-tengo">✓ Lo tienes</div>`
-            : `<button class="btn-comprar ${puede ? "" : "no"}" onclick="Juego.comprar('${cat}','${item.id}')">⭐ ${item.precio}</button>`}
+            ? `<div class="etiqueta-tengo">${Arte.icono("check", "#22a86c", 18, 3)} Lo tienes</div>`
+            : `<button class="btn-comprar ${puede ? "" : "no"}" onclick="Juego.comprar('${cat}','${item.id}')">${Arte.estrella(18)} ${item.precio}</button>`}
         </div>`;
     }).join("");
 
     app().innerHTML = `
       ${barra()}
       <div class="escena">
-        <button class="volver" onclick="Juego.mapa()">← Mapa</button>
-        <h1>Tienda del Pueblo 🏪</h1>
+        <button class="volver" onclick="Juego.volverTienda()">← Volver</button>
+        <h1>Tienda del Pueblo</h1>
         <div class="tabs">${tabs}</div>
         <div class="grid-tienda">${items}</div>
       </div>`;
+  },
+
+  // La tienda se abre desde la casa, el lugar Tienda o el vestidor: vuelve a donde estaba
+  volverTienda() {
+    const o = this.origenTienda; this.origenTienda = null;
+    if (o === "casa") return Casa.abrir();
+    if (o === "lugar") return this.lugar("tienda");
+    return this.volver();
   },
 
   comprar(cat, id) {
@@ -727,8 +608,8 @@ const Juego = {
     app().innerHTML = `
       ${barra()}
       <div class="escena">
-        <button class="volver" onclick="Juego.mapa()">← Mapa</button>
-        <h1>Ajustes ⚙️</h1>
+        <button class="volver" onclick="Juego.volver()">← Volver</button>
+        <h1>Ajustes</h1>
         <div class="ajuste">
           <p><b>Edad / dificultad:</b> ${e} ${e >= 11 ? "(nivel avanzado)" : "años"}</p>
           <p class="sub">Define el nivel inicial de cada materia. Cambiarla reinicia los niveles de abajo.</p>
@@ -754,15 +635,11 @@ const Juego = {
           </div>
         </div>
         <div class="ajuste">
-          <p><b>Colección de tesoros:</b> ${Estado.data.coleccion.length} encontrados ✨</p>
-          <p><b>Peces atrapados:</b> ${(Estado.data.coleccionPeces||[]).join(" ") || "—"} (${(Estado.data.coleccionPeces||[]).length}/${DATA.peces.length}) 🎣</p>
+          <p><b>Jugadora:</b> ${esc(Perfil.actual() || "—")}</p>
+          <button class="btn" onclick="Juego.cambiarJugadora()">Cambiar jugadora</button>
         </div>
         <div class="ajuste">
-          <p><b>Jugadora:</b> ${Perfil.actual() || "—"} 🐱</p>
-          <button class="btn" onclick="Juego.cambiarJugadora()">🔁 Cambiar jugadora</button>
-        </div>
-        <div class="ajuste">
-          <button class="btn rojo" onclick="Juego.confirmarReinicio()">🔄 Empezar de nuevo</button>
+          <button class="btn rojo" onclick="Juego.confirmarReinicio()">Empezar de nuevo</button>
         </div>
       </div>`;
   },
@@ -775,7 +652,7 @@ const Juego = {
     if (confirm("¿Borrar todo y empezar de nuevo? Se perderán las estrellas y objetos.")) {
       Estado.reiniciar();
       toast("¡Nuevo comienzo! 🌱");
-      this.mapa();
+      this.inicio();
     }
   },
 };

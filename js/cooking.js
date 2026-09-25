@@ -32,7 +32,7 @@ const PeluCook = {
       <div class="escena cocina-escena">
         <button class="volver" onclick="PeluCook.salir()">← Volver</button>
         <h1>Cocina Mágica 🧁</h1>
-        <div class="cocinera">${dibujarPelu(80)}<span class="gorro-chef">👩‍🍳</span></div>
+        <div class="cocinera">${dibujarPelu(90)}</div>
         <p class="sub">¿Qué cocinamos hoy?</p>
         <div class="grid-recetas">${cards}</div>
       </div>`;
@@ -245,6 +245,7 @@ const PeluCook = {
     const total = 6 + this.s.estrellas + creat;
     Estado.data.aventurasHechas["cocinar"] = (Estado.data.aventurasHechas["cocinar"] || 0) + 1;
     Estado.ganar(total);
+    if (window.Misiones) Misiones.registrar("cocinar");
     confeti();
     const amigo = rnd(["🐰", "🐶", "🐤", "🦔", "🐢", "🐿️"]);
     const base = this.s.horneado === "tostado" ? "🍪" : this.s.receta.emoji;

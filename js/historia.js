@@ -7,16 +7,16 @@
    ramifican y pequeños retos. Todo en DOM (táctil).
    ============================================================ */
 
-// Retrato de Pelu con look brujita-vampira (sombrero + murciélago)
-function dibujarPeluBruja(tam = 96) {
-  return `
-    <div class="pelu-bruja" style="width:${tam}px;height:${tam * 1.35}px">
-      <span class="pb-hat" style="font-size:${tam * 0.5}px">🎩</span>
-      <span class="pb-bat" style="font-size:${tam * 0.34}px">🦇</span>
-      <div class="pelu-svg" style="width:${tam}px">${PeluSprite.svg("feliz")}</div>
-      <span class="pb-star" style="font-size:${tam * 0.26}px">✨</span>
-    </div>`;
+// Retrato de Pelu con look brujita-vampira (sombrero de estrellas + murciélago), dibujado
+function dibujarPeluBruja(tam = 96, expresion = "feliz") {
+  return `<div class="pelu-bruja" style="width:${tam}px">${Arte.gata("pelu", { expresion, accesorios: ["gorro_estrella", "murcielago"] })}</div>`;
 }
+
+// Adornos del fondo: emoji del guion → dibujo SVG (arte-extra.js). Si no hay dibujo, queda el emoji.
+const DECO_DE = { "🏰": "castillo", "🌙": "luna", "⭐": "estrella", "✨": "chispa", "🦇": "murcielago", "🪄": "varita", "📚": "libro",
+  "🕯️": "vela", "🔮": "pocion", "🌳": "hoja", "🌿": "hoja", "🌸": "flor", "🦋": "chispa", "🪞": "estrella", "🕸️": "telarana",
+  "🎪": "castillo", "🎈": "globo", "🍬": "caramelo", "🐟": "pez", "🫧": "burbuja", "🎣": "pez", "🧁": "galleta", "☕": "cafe",
+  "🍪": "galleta", "🍩": "galleta", "🏠": "corazon", "💜": "corazon", "🧸": "corazon", "🪟": "estrella" };
 
 const Historia = {
   s: null,
@@ -58,8 +58,10 @@ const Historia = {
     if (b.juego) return this.lanzarJuego(b);   // reto jugable incrustado en el relato
 
     const f = this.fondos[s.fondo] || this.fondos.puerta;
-    const deco = f.deco.map((e, i) =>
-      `<span class="nov-deco" style="left:${8 + i * 20}%;top:${10 + (i % 3) * 22}%;animation-delay:${i * 0.4}s">${e}</span>`).join("");
+    const deco = f.deco.map((e, i) => {
+      const dib = Arte.deco(DECO_DE[e]);
+      return `<span class="nov-deco" style="left:${6 + i * 20}%;top:${8 + (i % 3) * 20}%;animation-delay:${i * 0.4}s">${dib || e}</span>`;
+    }).join("");
 
     let portada = "", caja = "", pie = "", clickable = "";
 
@@ -68,30 +70,34 @@ const Historia = {
       pie = `<div class="nov-continuar">▶ toca para seguir</div>`;
       clickable = `onclick="Historia.avanzar()"`;
     } else if (b.texto) {
-      const retrato = b.retrato === "pelu"
-        ? dibujarPeluBruja(96)
-        : `<div class="nov-emoji">${b.retrato || "🐱"}</div>`;
-      portada = `<div class="nov-portada ${b.retrato === "pelu" ? "es-pelu" : ""}">${retrato}</div>`;
+      // Escenario con dos personajes: Pelu a la izquierda y quien habla a la derecha
+      if (b.retrato === "pelu") {
+        portada = `<div class="nov-escenario solo"><div class="nov-pj habla">${dibujarPeluBruja(150)}</div></div>`;
+      } else {
+        const clave = Arte.clavePersonaje(b.quien, b.retrato), dib = clave && Arte.personaje(clave);
+        const otro = dib ? `<div class="nov-pj-dib">${dib}</div>` : `<div class="nov-emoji">${b.retrato || "🐱"}</div>`;
+        portada = `<div class="nov-escenario"><div class="nov-pj escucha">${dibujarPeluBruja(150)}</div><div class="nov-pj habla derecha">${otro}</div></div>`;
+      }
       caja = `<div class="nov-quien">${b.quien || ""}</div><p class="nov-texto">${b.texto}</p>`;
       pie = `<div class="nov-continuar">▶ toca para seguir</div>`;
       clickable = `onclick="Historia.avanzar()"`;
     } else if (b.eleccion) {
       const ops = b.opciones.map((o, i) =>
         `<button class="btn nov-opcion" onclick="Historia.elegir(${i})">${o.t}</button>`).join("");
-      portada = `<div class="nov-portada es-pelu">${dibujarPeluBruja(96)}</div>`;
+      portada = `<div class="nov-escenario solo"><div class="nov-pj habla">${dibujarPeluBruja(140, "sorpresa")}</div></div>`;
       caja = `<p class="nov-texto">${b.eleccion}</p><div class="nov-opciones">${ops}</div>`;
     } else if (b.reto) {
       const ops = b.opciones.map((o, i) =>
         `<button class="btn nov-opcion" onclick="Historia.responder(${i})">${o.t}</button>`).join("");
-      portada = `<div class="nov-portada es-pelu">${dibujarPeluBruja(96)}</div>`;
-      caja = `<p class="nov-texto">✨ ${b.reto}</p><div class="nov-opciones">${ops}</div>`;
+      portada = `<div class="nov-escenario solo"><div class="nov-pj habla">${dibujarPeluBruja(140)}</div></div>`;
+      caja = `<p class="nov-texto">${b.reto}</p><div class="nov-opciones">${ops}</div>`;
     }
 
     app().innerHTML = `
       ${barra()}
       <div class="escena novela-escena">
         <button class="volver" onclick="Historia.salir()">← Salir</button>
-        <button class="saltar-historia" onclick="event.stopPropagation();Historia.saltar()">Saltar ⏭️</button>
+        <button class="saltar-historia" onclick="event.stopPropagation();Historia.saltar()">Saltar ›</button>
         <div class="nov-vista" style="background:${f.grad}" ${clickable}>
           <div class="nov-deco-capa">${deco}</div>
           ${portada}
@@ -192,6 +198,7 @@ const Historia = {
     const paga = (!s.salto && !pagadas.includes(s.capId)) ? (fin.estrellas || 10) : 0;
     if (paga) pagadas.push(s.capId);
     Estado.ganar(paga);
+    if (!s.salto && window.Misiones) Misiones.registrar("capitulo");
     confeti();
     const premio = paga
       ? `<div class="premio">+${paga} ⭐</div>`

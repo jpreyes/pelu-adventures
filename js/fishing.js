@@ -237,6 +237,7 @@ class FishScene extends Phaser.Scene {
     } else {
       this.puntos += b.tipo.valor;
       this.txtPuntos.setText(this.puntos);
+      if (window.Misiones) Misiones.registrar("pez");
       // colección de especies
       if (!Estado.data.coleccionPeces.includes(b.tipo.emoji)) {
         Estado.data.coleccionPeces.push(b.tipo.emoji);

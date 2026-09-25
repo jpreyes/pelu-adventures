@@ -21,7 +21,7 @@ The game needs to be served over HTTP (not opened as a `file://`) because Phaser
 
 ### Service worker cache — critical during development
 
-`sw.js` caches all assets **cache-first**. After editing any JS/CSS you will keep running the **old** cached code until you bust the cache. When developing/verifying:
+`sw.js` caches all assets **cache-first**. On `localhost`/`127.0.0.1` the page does **not** register the service worker (and unregisters any old one), so local edits show after a reload — but the browser's HTTP cache can still serve stale JS: force it with `fetch(file, {cache: "reload"})` for the changed files, then reload. On the deployed site (GitHub Pages):
 
 1. Bump `const VERSION` in `sw.js` (e.g. `pelu-v6` → `pelu-v7`) — this is also required for every real deploy so the iPad picks up changes.
 2. Add any new asset path to the `ASSETS` array in `sw.js`.

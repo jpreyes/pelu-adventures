@@ -28,6 +28,9 @@
   <!-- El orden importa: data → sprite → game → aventuras → plataformas -->
   <script src="js/data.js"></script>
   <script src="js/pelu-sprite.js"></script>
+  <!-- Arte dibujado (SVG): gatitas, accesorios, edificios, muebles, mascotas… -->
+  <script src="js/arte.js"></script>
+  <script src="js/arte-extra.js"></script>
   <script src="js/game.js"></script>
   <!-- Contenido de retos (inglés y lógica) + generador por niveles -->
   <script src="js/ingles-vocab1.js"></script>
@@ -44,10 +47,19 @@
   <script src="js/escape.js"></script>
   <script src="js/historia.js"></script>
   <script src="js/mundo.js"></script>
+  <!-- Pueblo (inicio), misiones, álbum, casa de muñecas y vestidor -->
+  <script src="js/pueblo.js"></script>
+  <script src="js/casa.js"></script>
 
   <!-- Registrar el service worker para jugar sin internet (solo si hay soporte) -->
   <script>
-    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    // En desarrollo (localhost) no se usa el service worker: así cada cambio se ve al recargar.
+    const enDesarrollo = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    if (enDesarrollo && "serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
+      if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k)));
+    }
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http") && !enDesarrollo) {
       // Si llega una versión nueva mientras está abierto, recargar una vez para usarla
       // (antes la versión nueva recién se veía en la apertura siguiente).
       const habiaVersion = !!navigator.serviceWorker.controller;

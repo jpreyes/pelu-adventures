@@ -102,7 +102,10 @@ const Mundo = {
 class MundoScene extends Phaser.Scene {
   constructor() { super("MundoScene"); }
 
-  preload() { PeluSprite.cargar(this); }
+  preload() {
+    PeluSprite.cargar(this);
+    if (window.Arte) Arte.cargarPhaser(this);   // amigas y personajes dibujados (mismo estilo que el menú)
+  }
 
   create() {
     const def = MUNDOS[Mundo.actual] || MUNDOS.valle;
@@ -277,8 +280,17 @@ class MundoScene extends Phaser.Scene {
   // Personaje con diálogo
   npc(x, y, emoji, nombre, lineas) {
     this.add.graphics().setDepth(y - 1).fillStyle(0x2a3a24, 0.16).fillEllipse(x, y + 16, 44, 16);
-    this.add.text(x, y, emoji, { fontSize: "40px" }).setOrigin(0.5).setDepth(y);
-    this.add.text(x, y - 34, nombre, {
+    const clave = window.Arte && Arte.clavePersonaje(nombre, emoji);
+    let alto = 34;
+    if (clave && this.textures.exists("pj_" + clave)) {
+      // gatitas: el dibujo trae espacio para sombreros arriba (viewBox amplio)
+      const esGata = !!Arte.PALETAS[clave];
+      const img = this.add.image(x, y + 18, "pj_" + clave).setOrigin(0.5, esGata ? 0.94 : 0.98).setScale(esGata ? 0.42 : 0.36).setDepth(y);
+      alto = img.displayHeight * (esGata ? 0.72 : 0.95);
+    } else {
+      this.add.text(x, y, emoji, { fontSize: "40px" }).setOrigin(0.5).setDepth(y);
+    }
+    this.add.text(x, y + 18 - alto - 12, nombre, {
       fontFamily: "system-ui, sans-serif", fontSize: "15px", color: "#fff", stroke: "#00000055", strokeThickness: 4,
     }).setOrigin(0.5).setDepth(9000);
     this.zonas.push({ x, y, r: 78, tipo: "npc", nombre, lineas, label: `Hablar con ${nombre}` });
