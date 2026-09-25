@@ -41,7 +41,7 @@ const PeluPlatformer = {
     enemigos: [
       { x: 380, y: 410, rango: 130 },
       { x: 2330, y: 340, rango: 80 },
-      { x: 3150, y: 410, rango: 150 },
+      { x: 3200, y: 410, rango: 120 },          // patrulla 3080–3320, siempre sobre la isla
     ],
     secreto: { x: 2790, y: 230 },
     meta: { x: 3300, y: 380 },
@@ -67,7 +67,9 @@ const PeluPlatformer = {
         <button class="ctrl salto" data-k="jump">SALTAR ⬆</button>
       </div>`;
 
-    document.getElementById("btn-salir-juego").onclick = () => this.finish(0, true);
+    // Si ya ganó y está viendo el resultado, "Salir" igual cobra lo ganado
+    this.pendiente = 0;
+    document.getElementById("btn-salir-juego").onclick = () => this.finish(this.pendiente, true);
     cont.querySelectorAll(".ctrl").forEach(b => {
       const k = b.dataset.k;
       const on = e => { e.preventDefault(); this.keys[k] = true; };
@@ -92,12 +94,15 @@ const PeluPlatformer = {
   },
 
   finish(recompensa, salioAntes = false) {
-    if (this.game) { this.game.destroy(true); this.game = null; }
+    if (!this.game) return;                      // evita cobrar dos veces
+    this.game.destroy(true); this.game = null;
+    this.pendiente = 0;
     const cont = document.getElementById("juego-phaser");
     cont.style.display = "none";
     cont.innerHTML = "";
     document.getElementById("app").style.display = "";
     if (recompensa > 0) {
+      Juego.registrarJugada("carrera_bosque");
       Estado.ganar(recompensa);
       if (typeof confeti === "function") confeti();
       toast(`+${recompensa} ⭐ ¡Gran aventura, Pelu!`);
@@ -460,6 +465,7 @@ class PlatformScene extends Phaser.Scene {
       color: "#5a3d5c", backgroundColor: "#ffffffee", padding: { x: 24, y: 18 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(70);
     this.tweens.add({ targets: c, scale: { from: 0.6, to: 1 }, duration: 400, ease: "Back.out" });
+    PeluPlatformer.pendiente = total;
     this.time.delayedCall(2400, () => PeluPlatformer.finish(total));
   }
 
@@ -569,7 +575,7 @@ class PlatformScene extends Phaser.Scene {
 
     // Tesoro secreto
     if (this.secreto && Math.abs(this.secreto.x - this.player.x) < 32 && Math.abs(this.secreto.y - this.player.y) < 38) {
-      Estado.data.coleccion.push("💎"); Estado.guardar();
+      if (!Estado.data.coleccion.includes("🗺️")) { Estado.data.coleccion.push("🗺️"); Estado.guardar(); }
       this.brillito(this.secreto.x, this.secreto.y, "💎");
       this.cartel("¡Tesoro secreto! 💎", 1600);
       this.secreto.destroy(); this.secreto = null;

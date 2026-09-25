@@ -42,6 +42,15 @@
   <!-- Registrar el service worker para jugar sin internet (solo si hay soporte) -->
   <script>
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      // Si llega una versión nueva mientras está abierto, recargar una vez para usarla
+      // (antes la versión nueva recién se veía en la apertura siguiente).
+      const habiaVersion = !!navigator.serviceWorker.controller;
+      let recargando = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (!habiaVersion || recargando) return;
+        recargando = true;
+        location.reload();
+      });
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("sw.js").catch(() => {});
       });

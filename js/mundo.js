@@ -11,6 +11,9 @@
    reabren el mundo actual donde estaba (ver game.js).
    ============================================================ */
 
+// Misma letra redondeada que el menú (SF Pro Rounded en iPad)
+const FUENTE_MUNDO = 'ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif';
+
 const Mundo = {
   game: null,
   keys: { up: false, down: false, left: false, right: false, action: false },
@@ -51,6 +54,8 @@ const Mundo = {
       });
     }
     if (Mundo.game) { Mundo.game.destroy(true); Mundo.game = null; }
+    // Al llegar a un mundo nada queda "apretado" (evita rebotar por un portal)
+    for (const k in Mundo.keys) Mundo.keys[k] = false;
     Mundo.game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: "phaser-canvas",
@@ -58,7 +63,8 @@ const Mundo = {
       backgroundColor: "#8fd36a",
       pixelArt: false,
       physics: { default: "arcade", arcade: { debug: false } },
-      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      // EXPAND: llena toda la pantalla (en iPad 4:3 muestra más mundo, sin franjas vacías)
+      scale: { mode: Phaser.Scale.EXPAND, autoCenter: Phaser.Scale.CENTER_BOTH },
       scene: [MundoScene],
     });
   },
@@ -123,11 +129,19 @@ class MundoScene extends Phaser.Scene {
     // --- Teclado ---
     this.cursors = this.input.keyboard.createCursorKeys();
     this.teclaAccion = this.input.keyboard.addKeys({ sp: Phaser.Input.Keyboard.KeyCodes.SPACE, en: Phaser.Input.Keyboard.KeyCodes.ENTER });
-    this._prevAccion = false;
+    this._prevAccion = true;        // hay que soltar ✋/Espacio antes de la primera acción
 
-    this.prompt = this.add.text(Mundo.VW / 2, Mundo.VH - 64, "", {
-      fontFamily: "system-ui, sans-serif", fontSize: "22px", color: "#4a2a4a",
-      backgroundColor: "#fff7fc", padding: { x: 16, y: 8 },
+    // Si Pelu aparece encima de un portal/entrada (al llegar o al volver de un juego),
+    // esa zona no se activa hasta que se aleje: así no rebota ni re-entra sola.
+    this.armado = !this.zonas.some(z => z.tipo !== "npc" &&
+      Phaser.Math.Distance.Between(s.x, s.y, z.x, z.y) < z.r);
+
+    // Tocar la pantalla también avanza el diálogo (los niños tocan el cuadro)
+    this.input.on("pointerdown", () => { if (this.dialogo) this.avanzarDialogo(); });
+
+    this.prompt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height - 64, "", {
+      fontFamily: FUENTE_MUNDO, fontSize: "22px", color: "#4a2a4a", fontStyle: "bold",
+      backgroundColor: "#fff7fc", padding: { x: 18, y: 10 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(9000).setVisible(false);
 
     this.toastMundo(def.bienvenida || `¡${def.nombre}! 🐾  Camina y toca ✋ para hablar, entrar o viajar.`);
@@ -317,7 +331,12 @@ class MundoScene extends Phaser.Scene {
       const d = Phaser.Math.Distance.Between(this.pelu.x, this.pelu.y, z.x, z.y);
       if (d < z.r && d < dmin) { dmin = d; cerca = z; }
     }
+    if (!this.armado) {
+      if (!cerca || cerca.tipo === "npc") this.armado = true;   // ya salió de la zona de llegada
+      else cerca = null;
+    }
     this.zonaActiva = cerca;
+    this.prompt.setPosition(this.cameras.main.width / 2, this.cameras.main.height - 64);   // sigue al tamaño de pantalla
     if (cerca) this.prompt.setText("✋ " + cerca.label).setVisible(true);
     else this.prompt.setVisible(false);
 
@@ -331,13 +350,16 @@ class MundoScene extends Phaser.Scene {
   abrirDialogo(z) {
     this.dialogo = { lineas: z.lineas, i: 0, nombre: z.nombre };
     this.prompt.setVisible(false);
-    this.cajaDialogo = this.add.container(Mundo.VW / 2, Mundo.VH - 92).setScrollFactor(0).setDepth(9500);
+    // Arriba de la pantalla: abajo lo tapan la cruceta y el botón ✋
+    // (740 de ancho: deja libre el botón "✕ Salir" de la esquina)
+    this.cajaDialogo = this.add.container(this.cameras.main.width / 2 - 20, 84).setScrollFactor(0).setDepth(9500);
     const g = this.add.graphics();
-    g.fillStyle(0xffffff, 0.97).fillRoundedRect(-410, -60, 820, 118, 18);
-    g.lineStyle(4, 0xff9ecb, 1).strokeRoundedRect(-410, -60, 820, 118, 18);
-    this.txtNombre = this.add.text(-392, -48, "", { fontFamily: "system-ui, sans-serif", fontSize: "18px", color: "#c2477e", fontStyle: "bold" });
-    this.txtLinea = this.add.text(-392, -18, "", { fontFamily: "system-ui, sans-serif", fontSize: "22px", color: "#3a2a3a", wordWrap: { width: 780 } });
-    this.txtSeguir = this.add.text(392, 40, "✋ seguir ▶", { fontFamily: "system-ui, sans-serif", fontSize: "15px", color: "#b090a0" }).setOrigin(1, 0.5);
+    g.fillStyle(0x6a45d4, 0.18).fillRoundedRect(-370, -54, 740, 124, 22);       // sombra suave
+    g.fillStyle(0xffffff, 0.98).fillRoundedRect(-370, -60, 740, 124, 22);
+    g.lineStyle(3, 0xe3d8fb, 1).strokeRoundedRect(-370, -60, 740, 124, 22);
+    this.txtNombre = this.add.text(-348, -46, "", { fontFamily: FUENTE_MUNDO, fontSize: "18px", color: "#ffffff", fontStyle: "bold", backgroundColor: "#8a63f0", padding: { x: 12, y: 3 } });
+    this.txtLinea = this.add.text(-348, -12, "", { fontFamily: FUENTE_MUNDO, fontSize: "22px", color: "#46304f", wordWrap: { width: 696 } });
+    this.txtSeguir = this.add.text(348, 46, "toca para seguir ▶", { fontFamily: FUENTE_MUNDO, fontSize: "15px", color: "#8a63f0", fontStyle: "bold" }).setOrigin(1, 0.5);
     this.cajaDialogo.add([g, this.txtNombre, this.txtLinea, this.txtSeguir]);
     this.pintarDialogo();
   }
@@ -351,8 +373,8 @@ class MundoScene extends Phaser.Scene {
     else this.pintarDialogo();
   }
   toastMundo(txt) {
-    const t = this.add.text(Mundo.VW / 2, 40, txt, {
-      fontFamily: "system-ui, sans-serif", fontSize: "17px", color: "#4a2a4a",
+    const t = this.add.text(this.cameras.main.width / 2, 40, txt, {
+      fontFamily: FUENTE_MUNDO, fontSize: "17px", color: "#4a2a4a",
       backgroundColor: "#fff7fcdd", padding: { x: 14, y: 8 }, align: "center", wordWrap: { width: Mundo.VW - 80 },
     }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(9000);
     this.tweens.add({ targets: t, alpha: 0, delay: 3800, duration: 900, onComplete: () => t.destroy() });
@@ -404,7 +426,7 @@ const MUNDOS = {
       sc.casa(700, 430, 0xffe0c0, 0xe08a3c, "🧁", "Café", () =>
         Mundo.entrarActividad(760, 550, () => Historia.start("cafe_intro", "cocina")));
       sc.casa(1460, 900, 0xf7e2a6, 0xe0a63c, "🏪", "Tienda", () =>
-        Mundo.entrarActividad(1450, 1010, () => Juego.tienda("ropa")));
+        Mundo.entrarActividad(1450, 1010, () => Juego.lugar("tienda")));
 
       // Muelle -> mini-historia de pesca
       sc.zonas.push({ x: 1150, y: 500, r: 90, tipo: "lugar", label: "🎣 Ir a pescar",
@@ -416,7 +438,7 @@ const MUNDOS = {
         "¡Hola, Pelu! Bienvenida al Valle.",
         "En el Colegio te esperan aventuras… entra cuando quieras. 🏰",
         "Recuerda: ser diferente es tu superpoder. ✨"]);
-      sc.npc(1040, 430, "🐱", "Mia", [
+      sc.npc(1080, 600, "🐱", "Mia", [          // lejos de la puerta del Colegio (antes tapaba "Entrar")
         "Perdón por lo de la feria…",
         "Aprendí que ganar sola no es tan divertido. ¿Jugamos juntas? 💜"]);
       sc.npc(1170, 560, "🐈‍⬛", "Luna", [

@@ -47,6 +47,7 @@ const Estado = {
       coleccion: [],                      // tesoros secretos encontrados
       coleccionPeces: [],                 // especies de peces atrapadas (emoji)
       historia: [],                       // capítulos de la novela completados
+      historiaPagada: [],                 // capítulos cuyas estrellas ya se cobraron
     };
   },
 
@@ -57,9 +58,19 @@ const Estado = {
     } catch (e) {
       this.data = this.nuevo();
     }
+    // Saves anteriores a "historiaPagada": lo ya leído ya se cobró
+    if (!Array.isArray(this.data.historiaPagada)) this.data.historiaPagada = (this.data.historia || []).slice();
     // Asegura campos nuevos si el save es viejo
     const base = this.nuevo();
     for (const k in base) if (!(k in this.data)) this.data[k] = base[k];
+    // …y también dentro de "poseidos" (categorías nuevas de la tienda)
+    for (const c in base.poseidos) if (!Array.isArray(this.data.poseidos[c])) this.data.poseidos[c] = base.poseidos[c];
+    // Si un objeto se renombró o borró de DATA, lo quitamos para no romper la casa
+    const existe = (lista, id) => lista.some(x => x.id === id);
+    ["ropa", "muebles", "mascotas"].forEach(c => {
+      this.data.poseidos[c] = this.data.poseidos[c].filter(id => existe(DATA[c], id));
+    });
+    this.data.habitacion = this.data.habitacion.filter(id => existe(DATA.muebles, id));
     // Abre cualquier lugar marcado como desbloqueado (para saves viejos)
     DATA.lugares.forEach(l => {
       if (l.desbloqueado && !this.data.poseidos.lugares.includes(l.id)) this.data.poseidos.lugares.push(l.id);
@@ -67,7 +78,12 @@ const Estado = {
   },
 
   guardar() {
-    localStorage.setItem(Perfil.clave(), JSON.stringify(this.data));
+    try {
+      localStorage.setItem(Perfil.clave(), JSON.stringify(this.data));
+    } catch (e) {
+      // Sin espacio o modo privado: el juego sigue, pero avisamos una vez
+      if (!this._avisoGuardado) { this._avisoGuardado = true; toast("⚠️ No se pudo guardar el progreso en este equipo"); }
+    }
   },
 
   reiniciar() {
@@ -98,6 +114,8 @@ const app = () => document.getElementById("app");
 const rnd = arr => arr[Math.floor(Math.random() * arr.length)];
 const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
 const buscar = (arr, id) => arr.find(x => x.id === id);
+// Escapa texto del usuario (nombres) antes de meterlo en HTML
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 // Devuelve n opciones numéricas distintas (incluye la respuesta), mezcladas.
 // Siempre termina: acota los intentos y rellena si faltan (evita congelarse
@@ -171,21 +189,36 @@ function dibujarPelu(tam = 120, expresion = "feliz") {
 const Juego = {
 
   iniciar() {
+    // Pide al navegador que no borre el progreso (Safari lo hace tras 7 días sin uso)
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
     if (!Perfil.actual()) return this.perfiles();
     Estado.cargar();
     this.inicio();
   },
 
+  // Olvida cualquier "vuelta pendiente" (a un relato o al mundo caminable).
+  // Se usa en salidas deliberadas: 🏠, cambiar de jugadora.
+  limpiarPendientes() {
+    if (typeof Mundo !== "undefined") Mundo.pendiente = null;
+    if (typeof Historia !== "undefined") Historia.esperandoJuego = false;
+  },
+
+  // Marca una aventura como jugada (quita el "¡Nueva!" de su tarjeta)
+  registrarJugada(id) {
+    Estado.data.aventurasHechas[id] = (Estado.data.aventurasHechas[id] || 0) + 1;
+    Estado.guardar();
+  },
+
   /* ---------- INICIO: dos láminas (Historia / Minijuegos) ---------- */
   inicio() {
-    if (typeof Mundo !== "undefined") Mundo.pendiente = null;  // salida deliberada al hub
+    this.limpiarPendientes();                 // salida deliberada al hub
     app().innerHTML = `
       ${barra()}
       <div class="escena inicio-escena">
         <div class="saludo">
           ${dibujarPelu(96)}
           <h1>Pelu Adventures</h1>
-          <p class="sub">¿Qué hacemos hoy, ${Perfil.actual() || "exploradora"}? 🐾</p>
+          <p class="sub">¿Qué hacemos hoy, ${esc(Perfil.actual() || "exploradora")}? 🐾</p>
         </div>
         <div class="laminas">
           <div class="lamina lam-historia" onclick="Mundo.start()">
@@ -204,12 +237,14 @@ const Juego = {
 
   /* ---------- PERFILES (varias jugadoras) ---------- */
   perfiles() {
+    this.limpiarPendientes();
     const l = Perfil.lista();
+    // El nombre va en data-n (escapado): así un apóstrofe no rompe el onclick
     const cards = l.map(n => `
-      <div class="perfil-card" onclick="Juego.entrarPerfil('${encodeURIComponent(n)}')">
+      <div class="perfil-card" data-n="${esc(n)}" onclick="Juego.entrarPerfil(this.dataset.n)">
         <div class="perfil-avatar">🐱</div>
-        <div class="perfil-nombre">${n}</div>
-        <button class="perfil-x" onclick="event.stopPropagation();Juego.borrarPerfil('${encodeURIComponent(n)}')">✕</button>
+        <div class="perfil-nombre">${esc(n)}</div>
+        <button class="perfil-x" aria-label="Borrar" onclick="event.stopPropagation();Juego.borrarPerfil(this.parentNode.dataset.n)">✕</button>
       </div>`).join("");
     app().innerHTML = `
       <div class="escena perfiles-escena">
@@ -243,16 +278,17 @@ const Juego = {
 
   crearPerfil() {
     const inp = document.getElementById("nombre-input");
-    Perfil.crear(inp ? inp.value : "Jugadora");
+    const nombre = ((inp ? inp.value : "") || "").trim().slice(0, 14) || "Jugadora";
+    const yaExiste = Perfil.lista().includes(nombre);
+    Perfil.crear(nombre);
     Estado.cargar();
-    confeti();
-    this.mapa();
+    if (yaExiste) toast(`¡Hola de nuevo, ${nombre}! 💖`); else confeti();
+    this.inicio();
   },
 
-  entrarPerfil(n) { Perfil.elegir(decodeURIComponent(n)); Estado.cargar(); this.mapa(); },
+  entrarPerfil(n) { Perfil.elegir(n); Estado.cargar(); this.inicio(); },
 
   borrarPerfil(n) {
-    n = decodeURIComponent(n);
     if (confirm(`¿Borrar a ${n} y su progreso?`)) { Perfil.borrar(n); this.perfiles(); }
   },
 
@@ -323,8 +359,7 @@ const Juego = {
       return Mundo.reanudar(p);
     }
     if (id === "casa")   return this.casa();
-    if (id === "tienda") return this.tienda("ropa");
-    return this.lugar(id);
+    return this.lugar(id);             // la Tienda también: ahí vive el Mercadito
   },
 
   // Lugar genérico con sus aventuras
@@ -365,6 +400,10 @@ const Juego = {
           <span class="lugar-emoji-grande">${l.emoji}</span>
           <h1>${l.nombre}</h1>
         </div>
+        ${id === "tienda" ? `
+          <div class="acciones-casa">
+            <button class="btn grande" onclick="Juego.tienda('ropa')">🛍️ Comprar ropa, muebles y mascotas</button>
+          </div>` : ""}
         <h2>Aventuras</h2>
         <div class="lista-aventuras">${tarjetas}</div>
       </div>`;

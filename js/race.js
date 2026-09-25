@@ -40,7 +40,8 @@ const PeluRace = {
         <button class="ctrl salto" data-k="right">ACELERAR 💨</button>
       </div>`;
 
-    document.getElementById("btn-salir-juego").onclick = () => this.finish(0, true);
+    this.pendiente = 0;
+    document.getElementById("btn-salir-juego").onclick = () => this.finish(this.pendiente, true);
     cont.querySelectorAll(".ctrl").forEach(b => {
       const k = b.dataset.k;
       const on = e => { e.preventDefault(); this.keys[k] = true; };
@@ -65,12 +66,15 @@ const PeluRace = {
   },
 
   finish(recompensa, salioAntes = false) {
-    if (this.game) { this.game.destroy(true); this.game = null; }
+    if (!this.game) return;                      // evita cobrar dos veces
+    this.game.destroy(true); this.game = null;
+    this.pendiente = 0;
     const cont = document.getElementById("juego-phaser");
     cont.style.display = "none";
     cont.innerHTML = "";
     document.getElementById("app").style.display = "";
     if (recompensa > 0) {
+      Juego.registrarJugada("gran_carrera");
       Estado.ganar(recompensa);
       if (typeof confeti === "function") confeti();
       toast(`+${recompensa} ⭐ ¡Qué carrera, Pelu!`);
@@ -285,6 +289,7 @@ class RaceScene extends Phaser.Scene {
       color: "#5a3d5c", backgroundColor: "#ffffffee", padding: { x: 24, y: 18 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(70);
     this.tweens.add({ targets: c, scale: { from: 0.6, to: 1 }, duration: 400, ease: "Back.out" });
+    PeluRace.pendiente = total;
     this.time.delayedCall(2600, () => PeluRace.finish(total));
   }
 

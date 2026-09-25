@@ -36,7 +36,7 @@ const Historia = {
   start(capId = "cap1", lugar = "colegio") {
     const beats = this.capitulos[capId];
     if (!beats) return;
-    this.s = { capId, lugar, beats, i: 0, fondo: "puerta", etiquetas: {} };
+    this.s = { capId, lugar, beats, i: 0, fondo: "puerta", etiquetas: {}, salto: false };
     beats.forEach((b, idx) => { if (b.etiqueta !== undefined) this.s.etiquetas[b.etiqueta] = idx; });
     this.render();
   },
@@ -109,6 +109,7 @@ const Historia = {
   // Saltarse el relato: si viene un mini-juego incrustado, va directo a él;
   // si no, salta al final del capítulo (sin perderse la parte jugable).
   saltar() {
+    this.s.salto = true;                 // saltarse el relato no da las estrellas del final
     const b = this.s.beats;
     for (let j = this.s.i; j < b.length; j++) {
       if (b[j].juego) { this.s.i = j; return this.render(); }
@@ -130,6 +131,8 @@ const Historia = {
     const lugar = b.lugar || this.s.lugar;
     this.s.i++;                     // al volver, seguimos en el beat siguiente
     this.esperandoJuego = true;
+    this._juego = b.juego;
+    this._estrellasAntes = Estado.data.estrellas;   // para saber si terminó el reto
     // Actividades DOM (no Phaser): vestir/decorar y tienda
     if (b.juego === "casa")   { Juego.casa(); return; }
     if (b.juego === "tienda") { Juego.tienda("ropa"); return; }
@@ -137,7 +140,30 @@ const Historia = {
     if (mod && typeof mod.start === "function") { mod.start(lugar); }
     else { this.esperandoJuego = false; this.render(); }  // fallback: seguir el relato
   },
-  reanudarDesdeJuego() { this.render(); },
+  reanudarDesdeJuego() {
+    // Si salió del reto sin ganar nada, el relato no sigue como si lo hubiera logrado
+    const conPremio = this._juego !== "casa" && this._juego !== "tienda";
+    if (conPremio && Estado.data.estrellas <= this._estrellasAntes) return this.juegoPendiente();
+    this.render();
+  },
+
+  juegoPendiente() {
+    app().innerHTML = `
+      ${barra()}
+      <div class="escena novela-escena">
+        <div class="av-final">
+          <div class="nov-portada es-pelu">${dibujarPeluBruja(96)}</div>
+          <h1>¿Lo intentamos otra vez?</h1>
+          <p class="av-texto">La historia sigue cuando termines el reto. ¡Tú puedes! 💜</p>
+          <div class="botones-final">
+            <button class="btn grande" onclick="Historia.reintentarJuego()">🔁 Intentar de nuevo</button>
+            <button class="btn" onclick="Historia.salir()">← Salir</button>
+          </div>
+        </div>
+      </div>`;
+  },
+
+  reintentarJuego() { this.s.i--; this.lanzarJuego(this.s.beats[this.s.i]); },
 
   elegir(i) {
     const b = this.s.beats[this.s.i];
@@ -158,8 +184,20 @@ const Historia = {
     if (!Estado.data.historia) Estado.data.historia = [];
     if (!Estado.data.historia.includes(s.capId)) Estado.data.historia.push(s.capId);
     Estado.data.aventurasHechas[s.capId] = (Estado.data.aventurasHechas[s.capId] || 0) + 1;
-    Estado.ganar(fin.estrellas || 10);
+    // la tarjeta que abre este relato puede tener otro id (ej. "pescar" → lago_pesca)
+    DATA.aventuras.filter(a => a.capitulo === s.capId && a.id !== s.capId)
+      .forEach(a => { Estado.data.aventurasHechas[a.id] = (Estado.data.aventurasHechas[a.id] || 0) + 1; });
+    // Las estrellas del final se ganan una sola vez y leyendo sin saltar
+    const pagadas = Estado.data.historiaPagada;
+    const paga = (!s.salto && !pagadas.includes(s.capId)) ? (fin.estrellas || 10) : 0;
+    if (paga) pagadas.push(s.capId);
+    Estado.ganar(paga);
     confeti();
+    const premio = paga
+      ? `<div class="premio">+${paga} ⭐</div>`
+      : `<p class="sub">${s.salto
+          ? "Saltaste el relato: las estrellas del final se ganan leyéndolo completo ✨"
+          : "Ya ganaste las estrellas de este capítulo. ¡Qué lindo releerlo! 💜"}</p>`;
     app().innerHTML = `
       ${barra()}
       <div class="escena novela-escena">
@@ -167,10 +205,10 @@ const Historia = {
           <div class="nov-portada es-pelu">${dibujarPeluBruja(110)}</div>
           <h1>📖 ¡Capítulo completado!</h1>
           <p class="av-texto">${fin.mensaje || "Sigue la aventura…"}</p>
-          <div class="premio">+${fin.estrellas || 10} ⭐</div>
+          ${premio}
           <div class="botones-final">
             <button class="btn grande" onclick="Historia.start('${s.capId}','${s.lugar}')">🔁 Releer</button>
-            <button class="btn" onclick="Historia.salir()">🏰 Volver</button>
+            <button class="btn" onclick="Historia.salir()">← Volver</button>
           </div>
         </div>
       </div>`;

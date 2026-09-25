@@ -17,7 +17,7 @@ const PeluCook = {
     this.elegir();
   },
 
-  salir() { Juego.entrar(this.s.lugar); },
+  salir() { clearInterval(this.s._horno); Juego.entrar(this.s.lugar); },
 
   /* ---- 1) Elegir receta ---- */
   elegir() {
@@ -41,6 +41,8 @@ const PeluCook = {
   empezarReceta(id) {
     const r = buscar(DATA.recetas, id);
     this.s.receta = r; this.s.pasoIdx = 0; this.s.conteo = 0; this.s.recolectado = [];
+    // "Otra receta" reutiliza this.s: se limpia lo de la receta anterior
+    this.s.estrellas = 0; this.s.toppings = []; this.s.horneado = ""; this.s.servido = false; this.s.batidas = 0;
     this.s.total = r.pasos.reduce((a, p) => a + p.cant, 0);
     this.ingredientes();
   },
@@ -142,12 +144,14 @@ const PeluCook = {
   },
 
   batir() {
+    if (this.s.mezcla >= 100) return;            // ya está lista: toques extra no cuentan
     this.s.mezcla += 14;
+    this.s.batidas = (this.s.batidas || 0) + 1;
     const fill = document.getElementById("mezcla-fill");
     const bowl = document.getElementById("mezcla-bowl");
     if (fill) fill.style.width = Math.min(100, this.s.mezcla) + "%";
-    if (bowl) { bowl.style.transform = `rotate(${(this.s.mezcla % 2 ? 12 : -12)}deg)`; }
-    if (this.s.mezcla >= 100) { setTimeout(() => this.hornear(), 250); }
+    if (bowl) { bowl.style.transform = `rotate(${(this.s.batidas % 2 ? 12 : -12)}deg)`; }
+    if (this.s.mezcla >= 100) { this.luego(() => this.hornear(), 250); }
   },
 
   /* ---- 5) Hornear (timing: detén en la zona perfecta) ---- */
@@ -169,6 +173,8 @@ const PeluCook = {
     let pos = 0, dir = 1;
     const vel = 1.1 + Math.min(1.2, Estado.data.edad * 0.12); // más rápido = más difícil con la edad
     this.s._horno = setInterval(() => {
+      // Si salió con 🏠 a mitad del horneado, el horno se apaga solo
+      if (!document.body.contains(aguja)) { clearInterval(this.s._horno); this.s._horno = null; return; }
       pos += dir * vel;
       if (pos >= 100) { pos = 100; dir = -1; }
       if (pos <= 0) { pos = 0; dir = 1; }
@@ -178,7 +184,9 @@ const PeluCook = {
   },
 
   detenerHorno() {
+    if (!this.s._horno) return;                  // un solo "¡LISTO!" por horneada
     clearInterval(this.s._horno);
+    this.s._horno = null;
     const pos = this.s._hpos || 0;
     // zona perfecta: 40%–60%; bien: 25%–75%
     let bonus = 0, msg = "";
@@ -188,7 +196,14 @@ const PeluCook = {
     else { this.s.horneado = "tostado"; msg = "Un pelín tostado 😆 ¡con cariño igual!"; }
     this.s.estrellas += bonus;
     confeti(); toast(msg);
-    setTimeout(() => this.decorar(), 700);
+    this.luego(() => this.decorar(), 700);
+  },
+
+  // Como setTimeout, pero solo si sigue en esta misma cocina (no pinta encima de
+  // otra pantalla si la niña salió o empezó otra receta mientras tanto)
+  luego(fn, ms) {
+    const s = this.s;
+    setTimeout(() => { if (this.s === s && document.querySelector(".cocina-escena")) fn(); }, ms);
   },
 
   /* ---- 6) Decorar (creatividad libre) ---- */
@@ -224,6 +239,8 @@ const PeluCook = {
 
   /* ---- 7) Servir y recompensa ---- */
   servir() {
+    if (this.s.servido) return;
+    this.s.servido = true;
     const creat = Math.min(5, this.s.toppings.length);
     const total = 6 + this.s.estrellas + creat;
     Estado.data.aventurasHechas["cocinar"] = (Estado.data.aventurasHechas["cocinar"] || 0) + 1;

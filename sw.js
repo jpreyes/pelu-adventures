@@ -4,7 +4,7 @@
    Sube el número de versión cuando cambies archivos para que
    se actualice el caché.
    ============================================================ */
-const VERSION = "pelu-v23";
+const VERSION = "pelu-v24";
 const ASSETS = [
   "./",
   "./index.html",
@@ -29,7 +29,11 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache:"reload" salta la caché HTTP del navegador: si no, una versión nueva
+  // podía guardar copias viejas de los archivos y el iPad no veía los cambios.
+  e.waitUntil(caches.open(VERSION)
+    .then(c => c.addAll(ASSETS.map(u => new Request(u, { cache: "reload" }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
@@ -43,9 +47,15 @@ self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
-      const copy = res.clone();
-      caches.open(VERSION).then(c => c.put(e.request, copy)).catch(() => {});
+      if (res.ok) {                               // no guardar errores (404/500)
+        const copy = res.clone();
+        caches.open(VERSION).then(c => c.put(e.request, copy)).catch(() => {});
+      }
       return res;
-    }).catch(() => caches.match("./index.html")))
+    }).catch(() => {
+      // Sin internet: solo las páginas caen a index.html (un .js no debe recibir HTML)
+      if (e.request.mode === "navigate") return caches.match("./index.html");
+      return Response.error();
+    }))
   );
 });

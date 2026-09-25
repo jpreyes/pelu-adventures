@@ -26,7 +26,8 @@ const PeluFish = {
         </div>
         <button class="ctrl salto" data-k="down">BAJAR ⬇</button>
       </div>`;
-    document.getElementById("btn-salir-juego").onclick = () => this.finish(0, true);
+    this.pendiente = 0;
+    document.getElementById("btn-salir-juego").onclick = () => this.finish(this.pendiente, true);
     cont.querySelectorAll(".ctrl").forEach(b => {
       const k = b.dataset.k;
       const on = e => { e.preventDefault(); this.keys[k] = true; };
@@ -50,11 +51,14 @@ const PeluFish = {
   },
 
   finish(recompensa, salioAntes = false) {
-    if (this.game) { this.game.destroy(true); this.game = null; }
+    if (!this.game) return;                      // evita cobrar dos veces
+    this.game.destroy(true); this.game = null;
+    this.pendiente = 0;
     const cont = document.getElementById("juego-phaser");
     cont.style.display = "none"; cont.innerHTML = "";
     document.getElementById("app").style.display = "";
     if (recompensa > 0) {
+      Juego.registrarJugada("pescar");
       Estado.ganar(recompensa);
       if (typeof confeti === "function") confeti();
       toast(`+${recompensa} ⭐ ¡Buena pesca, Pelu!`);
@@ -263,6 +267,7 @@ class FishScene extends Phaser.Scene {
       fontFamily: "Comic Sans MS, sans-serif", color: "#1c4e63", backgroundColor: "#ffffffee",
       padding: { x: 24, y: 18 } }).setOrigin(0.5).setDepth(70);
     this.tweens.add({ targets: c, scale: { from: 0.6, to: 1 }, duration: 400, ease: "Back.out" });
+    PeluFish.pendiente = total;
     this.time.delayedCall(2600, () => PeluFish.finish(total));
   }
 }

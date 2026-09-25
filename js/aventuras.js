@@ -73,8 +73,10 @@ const Aventura = {
     confeti();
     // De vez en cuando, un tesoro secreto coleccionable
     let tesoro = "";
-    if (Math.random() < 0.3) {
-      const t = rnd(["🌟","🔮","🍀","🐚","💎","🦴","🗿","🎏"]);
+    // Solo tesoros que aún no tiene (la colección no se llena de repetidos)
+    const faltan = ["🌟","🔮","🍀","🐚","🦴","🗿","🎏","🪶","🧿","🏺"].filter(t => !Estado.data.coleccion.includes(t));
+    if (faltan.length && Math.random() < 0.3) {
+      const t = rnd(faltan);
       Estado.data.coleccion.push(t);
       Estado.guardar();
       tesoro = `<p class="tesoro">¡Encontraste un tesoro secreto! ${t}</p>`;
@@ -344,7 +346,7 @@ const Aventura = {
   dinero() {
     const a = this.actual;
     const edad = Estado.data.edad;
-    const productos = [["🍎","manzana"],["🍌","plátano"],["🧁","pastelito"],["🍪","galleta"],["🍓","fresa"]];
+    const productos = [["🍎","la manzana"],["🍌","el plátano"],["🧁","el pastelito"],["🍪","la galleta"],["🍓","la fresa"]];
     const [emoji, nombre] = rnd(productos);
     const precio = 1 + Math.floor(Math.random() * (edad <= 5 ? 4 : 7));
 
@@ -358,7 +360,7 @@ const Aventura = {
       titulo: a.nombre,
       escena: `<div class="producto-mercado"><div class="grande-emoji">${emoji}</div>
                <div class="precio-cartel">Cuesta ${precio} 🪙</div></div>`,
-      pregunta: `Pelu quiere la ${nombre}. ¿Con cuántas monedas la paga?`,
+      pregunta: `Pelu quiere ${nombre}. ¿Con cuántas monedas lo paga?`,
       opciones,
       onElegir: (i, btn) => {
         const ok = opciones[i].valor === precio;

@@ -27,7 +27,8 @@ const PeluSwim = {
         </div>
         <button class="ctrl salto" data-k="down">BUCEAR ⬇</button>
       </div>`;
-    document.getElementById("btn-salir-juego").onclick = () => this.finish(0, true);
+    this.pendiente = 0;
+    document.getElementById("btn-salir-juego").onclick = () => this.finish(this.pendiente, true);
     cont.querySelectorAll(".ctrl").forEach(b => {
       const k = b.dataset.k;
       const on = e => { e.preventDefault(); this.keys[k] = true; };
@@ -51,11 +52,14 @@ const PeluSwim = {
   },
 
   finish(recompensa, salioAntes = false) {
-    if (this.game) { this.game.destroy(true); this.game = null; }
+    if (!this.game) return;                      // evita cobrar dos veces
+    this.game.destroy(true); this.game = null;
+    this.pendiente = 0;
     const cont = document.getElementById("juego-phaser");
     cont.style.display = "none"; cont.innerHTML = "";
     document.getElementById("app").style.display = "";
     if (recompensa > 0) {
+      Juego.registrarJugada("bucear");
       Estado.ganar(recompensa);
       if (typeof confeti === "function") confeti();
       toast(`+${recompensa} ⭐ ¡Gran buceo, Pelu!`);
@@ -232,7 +236,7 @@ class SwimScene extends Phaser.Scene {
     else if (o.tipo === "joya") { this.joyas++; this.txtJoyas.setText(this.joyas); this.brillito(o.x, o.y, "💎 +3"); }
     else if (o.tipo === "aire") { this.aire = Math.min(100, this.aire + 32); this.brillito(o.x, o.y, "🫧 aire"); }
     else if (o.tipo === "secreto") {
-      Estado.data.coleccion.push("💰"); Estado.guardar();
+      if (!Estado.data.coleccion.includes("💰")) { Estado.data.coleccion.push("💰"); Estado.guardar(); }
       this.perlas += 3; this.txtPerlas.setText(this.perlas);
       this.brillito(o.x, o.y, "¡tesoro! 💰");
     }
@@ -248,6 +252,7 @@ class SwimScene extends Phaser.Scene {
       fontFamily: "Comic Sans MS, sans-serif", color: "#fff", backgroundColor: "#0e3a55ee",
       padding: { x: 24, y: 18 } }).setOrigin(0.5).setScrollFactor(0).setDepth(70);
     this.tweens.add({ targets: c, scale: { from: 0.6, to: 1 }, duration: 400, ease: "Back.out" });
+    PeluSwim.pendiente = total;
     this.time.delayedCall(2600, () => PeluSwim.finish(total));
   }
 }
